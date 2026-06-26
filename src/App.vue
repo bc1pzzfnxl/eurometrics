@@ -145,7 +145,7 @@ const formattedLastUpdated = computed(() => {
       </div>
       <div class="flex items-center gap-6">
         <a href="https://ec.europa.eu/eurostat" target="_blank" rel="noopener noreferrer" class="transition-opacity hover:opacity-100 opacity-75">
-          <img src="/eurostat_logo.svg" alt="Eurostat" class="h-5 object-contain" />
+          <img src="/eurostat_logo.png" alt="Eurostat" class="h-5 object-contain" />
         </a>
         <a href="https://www.ecb.europa.eu" target="_blank" rel="noopener noreferrer" class="transition-opacity hover:opacity-100 opacity-75">
           <img src="/ecb_logo.svg" alt="ECB" class="h-6 object-contain" />
