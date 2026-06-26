@@ -40,10 +40,8 @@ const handleResize = () => {
 };
 
 onMounted(() => {
-  // Only load API data if the user goes directly to the app
-  if (currentPath.value === '/app') {
-    dataStore.fetchAllData();
-  }
+  // Always load API data in the background to prime the cache and populate the marquee
+  dataStore.fetchAllData();
 
   window.addEventListener('popstate', handlePopState);
   window.addEventListener('keydown', handleKeyDown);
@@ -84,6 +82,36 @@ const formattedLastUpdated = computed(() => {
   const hh = pad(date.getHours());
   const min = pad(date.getMinutes());
   return `${yyyy}-${mm}-${dd} ${hh}:${min}`;
+});
+
+const marqueeItems = computed(() => {
+  const getLatest = (arr: any[] | undefined) => {
+    if (!arr || arr.length === 0) return null;
+    return arr[arr.length - 1];
+  };
+
+  const dfr = getLatest(dataStore.policyRatesData?.['DFR'])?.value;
+  const mrr = getLatest(dataStore.policyRatesData?.['MRR_FR'])?.value;
+  const inflation = getLatest(dataStore.inflationData?.['EA'])?.value;
+  const ea10y = getLatest(dataStore.euroAreaAll?.['SR_10Y'])?.value;
+  const de10y = getLatest(dataStore.countriesData?.['DE'])?.value;
+  const fr10y = getLatest(dataStore.countriesData?.['FR'])?.value;
+  const it10y = getLatest(dataStore.countriesData?.['IT'])?.value;
+  const eurUsd = getLatest(dataStore.exchangeRatesData?.['USD'])?.value;
+  const eurGbp = getLatest(dataStore.exchangeRatesData?.['GBP'])?.value;
+
+  // ponytail: fallback values are provided so marquee is instantly populated before background fetch finishes
+  return [
+    { label: 'ECB DEPOSIT RATE', value: dfr !== undefined ? `${dfr.toFixed(2)}%` : '3.25%' },
+    { label: 'ECB REFI RATE', value: mrr !== undefined ? `${mrr.toFixed(2)}%` : '3.50%' },
+    { label: 'EURO INFLATION', value: inflation !== undefined ? `${inflation.toFixed(1)}%` : '2.0%' },
+    { label: 'EA 10Y YIELD', value: ea10y !== undefined ? `${ea10y.toFixed(2)}%` : '3.12%' },
+    { label: 'DE 10Y YIELD', value: de10y !== undefined ? `${de10y.toFixed(2)}%` : '2.40%' },
+    { label: 'FR 10Y YIELD', value: fr10y !== undefined ? `${fr10y.toFixed(2)}%` : '3.05%' },
+    { label: 'IT 10Y YIELD', value: it10y !== undefined ? `${it10y.toFixed(2)}%` : '3.85%' },
+    { label: 'EUR / USD', value: eurUsd !== undefined ? eurUsd.toFixed(4) : '1.0850' },
+    { label: 'EUR / GBP', value: eurGbp !== undefined ? eurGbp.toFixed(4) : '0.8540' },
+  ];
 });
 </script>
 
@@ -135,6 +163,26 @@ const formattedLastUpdated = computed(() => {
         </span>
       </div>
     </main>
+
+    <!-- Marquee Ticker -->
+    <div class="w-full border-y border-[#003399]/10 bg-[#003399]/2 py-3 overflow-hidden select-none z-10">
+      <div class="flex whitespace-nowrap w-max animate-marquee">
+        <!-- First instance -->
+        <div class="flex items-center gap-12 px-6 font-mono text-[10px] md:text-xs text-[#003399]/80">
+          <div v-for="(item, idx) in marqueeItems" :key="'m1-' + idx" class="flex items-center gap-2">
+            <span class="font-bold tracking-wider uppercase text-[#003399]/50">{{ item.label }}:</span>
+            <span class="font-semibold text-[#003399]">{{ item.value }}</span>
+          </div>
+        </div>
+        <!-- Duplicated instance for seamless loop -->
+        <div class="flex items-center gap-12 px-6 font-mono text-[10px] md:text-xs text-[#003399]/80" aria-hidden="true">
+          <div v-for="(item, idx) in marqueeItems" :key="'m2-' + idx" class="flex items-center gap-2">
+            <span class="font-bold tracking-wider uppercase text-[#003399]/50">{{ item.label }}:</span>
+            <span class="font-semibold text-[#003399]">{{ item.value }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <!-- Footer -->
     <footer class="w-full max-w-5xl mx-auto px-6 py-8 flex flex-col sm:flex-row justify-between items-center gap-6 text-[9px] font-mono text-[#003399]/60 z-10 border-t border-[#003399]/10">
