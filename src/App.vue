@@ -9,8 +9,27 @@ import ThemeToggle from './components/ThemeToggle.vue';
 const dataStore = useBondDataStore();
 const filtersStore = useFiltersStore();
 
+const currentPath = ref(window.location.pathname);
 const scrollY = ref(0);
 const windowHeight = ref(0);
+
+const navigateTo = (path: string) => {
+  window.history.pushState({}, '', path);
+  currentPath.value = path;
+  if (path === '/app') {
+    dataStore.fetchAllData();
+  }
+};
+
+const handlePopState = () => {
+  currentPath.value = window.location.pathname;
+};
+
+const handleKeyDown = (e: KeyboardEvent) => {
+  if (currentPath.value !== '/app' && e.key === 'Enter') {
+    navigateTo('/app');
+  }
+};
 
 const handleScroll = () => {
   scrollY.value = window.scrollY;
@@ -21,9 +40,13 @@ const handleResize = () => {
 };
 
 onMounted(() => {
-  // Fetch bond data on app load
-  dataStore.fetchAllData();
+  // Only load API data if the user goes directly to the app
+  if (currentPath.value === '/app') {
+    dataStore.fetchAllData();
+  }
 
+  window.addEventListener('popstate', handlePopState);
+  window.addEventListener('keydown', handleKeyDown);
   window.addEventListener('scroll', handleScroll, { passive: true });
   window.addEventListener('resize', handleResize);
   windowHeight.value = window.innerHeight;
@@ -31,17 +54,18 @@ onMounted(() => {
 });
 
 onUnmounted(() => {
+  window.removeEventListener('popstate', handlePopState);
+  window.removeEventListener('keydown', handleKeyDown);
   window.removeEventListener('scroll', handleScroll);
   window.removeEventListener('resize', handleResize);
 });
 
 const screen1Style = computed(() => {
   if (windowHeight.value === 0) return {};
-  // Compute progress of the scroll over the first page (up to 85% of viewport height)
   const progress = Math.min(scrollY.value / (windowHeight.value * 0.85), 1);
-  const blurVal = progress * 8; // Max 8px blur
-  const opacityVal = 1 - (progress * 0.45); // Fade to 55% opacity
-  const scaleVal = 1 - (progress * 0.04); // Subtle scale down to 96%
+  const blurVal = progress * 8;
+  const opacityVal = 1 - (progress * 0.45);
+  const scaleVal = 1 - (progress * 0.04);
 
   return {
     filter: `blur(${blurVal}px)`,
@@ -64,7 +88,69 @@ const formattedLastUpdated = computed(() => {
 </script>
 
 <template>
-  <div class="relative bg-background text-foreground min-h-screen">
+  <!-- Screen A: Landing Page -->
+  <div v-if="currentPath !== '/app'" class="relative bg-white text-[#003399] min-h-[100dvh] w-full flex flex-col justify-between overflow-hidden select-none font-sans">
+    <!-- ASCII Background (Centered and scaling responsively) -->
+    <div class="absolute inset-0 flex items-center justify-center pointer-events-none select-none z-0">
+      <pre class="font-mono text-[2.8vw] md:text-[1.8vw] lg:text-[1.3vw] leading-none text-[#003399]/5 select-none pointer-events-none tracking-tighter">
+           €€€€€€€€€€€
+       €€€€€        €€€€
+     €€€€
+    €€€€
+  €€€€€€€€€€€€€€€
+  €€€€€€€€€€€€€€
+  €€€€
+  €€€€€€€€€€€€€€
+  €€€€€€€€€€€€€
+  €€€€
+    €€€€
+     €€€€€        €€€€
+         €€€€€€€€€€€
+      </pre>
+    </div>
+
+    <!-- Header / Metadata -->
+    <header class="w-full max-w-5xl mx-auto px-6 py-8 flex justify-between items-center z-10">
+      <div class="font-mono text-[9px] tracking-widest uppercase font-semibold text-[#003399]/70">
+        EUROPEAN UNION / MACRO STATISTICS
+      </div>
+      <div class="font-mono text-[9px] border border-[#003399]/15 px-2 py-0.5 text-[#003399]/50">
+        EDITION 2026
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="w-full max-w-4xl mx-auto px-6 flex-grow flex flex-col justify-center items-center text-center z-10 gap-6 my-auto">
+      <h1 class="font-serif italic text-7xl sm:text-8xl md:text-9xl tracking-tight leading-none text-[#003399] select-none">
+        EuroMetrics
+      </h1>
+      <p class="font-mono text-[10px] sm:text-xs tracking-wider uppercase text-[#003399]/80 max-w-md leading-relaxed select-none">
+        A minimalist real-time dashboard for Eurozone sovereign yields, macroeconomics, and central bank policy.
+      </p>
+      
+      <!-- CTA -->
+      <div class="mt-8 flex flex-col items-center gap-3">
+        <button
+          @click="navigateTo('/app')"
+          class="px-8 py-3 bg-[#003399] text-white font-mono text-[10px] tracking-widest uppercase font-bold hover:bg-[#002280] active:scale-98 transition-all cursor-pointer border-0 shadow-none rounded-none"
+        >
+          ENTER DASHBOARD
+        </button>
+        <span class="font-mono text-[8px] text-[#003399]/40 select-none uppercase tracking-widest">
+          Press Enter or Click to Launch
+        </span>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="w-full max-w-5xl mx-auto px-6 py-8 flex flex-col sm:flex-row justify-between items-center gap-4 text-[9px] font-mono text-[#003399]/60 z-10 border-t border-[#003399]/10">
+      <span>SOURCE: EUROPEAN CENTRAL BANK & EUROSTAT</span>
+      <span>© {{ new Date().getFullYear() }} EUROMETRICS</span>
+    </footer>
+  </div>
+
+  <!-- Screen B: Main Dashboard App -->
+  <div v-else class="relative bg-background text-foreground min-h-screen">
     <!-- Screen 1: Sticky Main Dashboard (Header + Controls + Chart) -->
     <div
       class="sticky top-0 h-[100dvh] w-full flex flex-col justify-between max-w-6xl mx-auto border-x border-border z-0 overflow-hidden will-change-[transform,filter,opacity]"
@@ -150,7 +236,7 @@ const formattedLastUpdated = computed(() => {
               Under the Maastricht Treaty's long-term interest rate convergence criterion (Article 140 TFEU), a Member State's nominal 10-year government bond yield must not exceed by more than <strong>2 percentage points</strong> the average yield of the three best-performing EU Member States in terms of price stability (lowest inflation) over a one-year reference period.
             </p>
           </div>
-
+          
           <!-- Card 3 -->
           <div class="flex flex-col md:flex-row items-start gap-4 md:gap-6 p-5 border border-border bg-surface/50">
             <div class="flex items-center gap-2 text-text-primary font-bold shrink-0 bg-surface px-3 py-1.5 border border-border text-xs md:text-sm">
