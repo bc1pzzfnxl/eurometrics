@@ -90,22 +90,23 @@ const formattedLastUpdated = computed(() => {
 <template>
   <!-- Screen A: Landing Page -->
   <div v-if="currentPath !== '/app'" class="relative bg-white text-[#003399] min-h-[100dvh] w-full flex flex-col justify-between overflow-hidden select-none font-sans">
-    <!-- ASCII Background (Left-aligned, scaling responsively) -->
+    <!-- ASCII Background (Left-aligned, scaling responsively with Euro symbol and yellow EU stars) -->
     <div class="absolute inset-y-0 left-0 flex items-center justify-start pointer-events-none select-none z-0 pl-6 sm:pl-12 md:pl-20">
-      <pre class="font-mono text-[2.8vw] md:text-[1.8vw] lg:text-[1.3vw] leading-none text-[#003399]/8 select-none pointer-events-none tracking-tighter">
-           €€€€€€€€€€€
-       €€€€€        €€€€
-     €€€€
-    €€€€
-  €€€€€€€€€€€€€€€
-  €€€€€€€€€€€€€€
-  €€€€
-  €€€€€€€€€€€€€€
-  €€€€€€€€€€€€€
-  €€€€
-    €€€€
-     €€€€€        €€€€
-         €€€€€€€€€€€
+      <pre class="font-mono text-[2.5vw] md:text-[1.6vw] lg:text-[1.2vw] leading-none text-[#003399]/20 select-none pointer-events-none tracking-tighter">
+               <span class="text-[#FFCC00]/50">★</span>
+          <span class="text-[#FFCC00]/50">★</span>         <span class="text-[#FFCC00]/50">★</span>
+       <span class="text-[#FFCC00]/50">★</span>               <span class="text-[#FFCC00]/50">★</span>
+            €€€€€€€
+     <span class="text-[#FFCC00]/50">★</span>    €€€     €€€    <span class="text-[#FFCC00]/50">★</span>
+        €€€€
+   <span class="text-[#FFCC00]/50">★</span>   €€€€€€€€€€€€€      <span class="text-[#FFCC00]/50">★</span>
+       €€€€€€€€€€€
+   <span class="text-[#FFCC00]/50">★</span>    €€€€              <span class="text-[#FFCC00]/50">★</span>
+          €€€     €€€
+     <span class="text-[#FFCC00]/50">★</span>      €€€€€€€      <span class="text-[#FFCC00]/50">★</span>
+       <span class="text-[#FFCC00]/50">★</span>               <span class="text-[#FFCC00]/50">★</span>
+          <span class="text-[#FFCC00]/50">★</span>         <span class="text-[#FFCC00]/50">★</span>
+               <span class="text-[#FFCC00]/50">★</span>
       </pre>
     </div>
 
@@ -143,11 +144,11 @@ const formattedLastUpdated = computed(() => {
         <span>OFFICIAL DATA SOURCES</span>
       </div>
       <div class="flex items-center gap-6">
-        <a href="https://ec.europa.eu/eurostat" target="_blank" rel="noopener noreferrer" class="transition-opacity hover:opacity-100 opacity-70">
-          <img src="https://upload.wikimedia.org/wikipedia/commons/e/e0/Eurostat_logo.svg" alt="Eurostat" class="h-5 object-contain" />
+        <a href="https://ec.europa.eu/eurostat" target="_blank" rel="noopener noreferrer" class="transition-opacity hover:opacity-100 opacity-75">
+          <img src="/eurostat_logo.svg" alt="Eurostat" class="h-5 object-contain" />
         </a>
-        <a href="https://www.ecb.europa.eu" target="_blank" rel="noopener noreferrer" class="transition-opacity hover:opacity-100 opacity-70">
-          <img src="https://upload.wikimedia.org/wikipedia/commons/b/b7/Logo_European_Central_Bank.svg" alt="ECB" class="h-6 object-contain" />
+        <a href="https://www.ecb.europa.eu" target="_blank" rel="noopener noreferrer" class="transition-opacity hover:opacity-100 opacity-75">
+          <img src="/ecb_logo.svg" alt="ECB" class="h-6 object-contain" />
         </a>
       </div>
     </footer>
