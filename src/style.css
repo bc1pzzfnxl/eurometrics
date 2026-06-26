@@ -76,3 +76,42 @@
 .animate-marquee:hover {
   animation-play-state: paused;
 }
+
+@keyframes curve-anim-1 {
+  0%, 100% {
+    d: path("M 0,450 C 300,430 600,250 900,200 C 1200,170 1440,160 1440,160");
+  }
+  50% {
+    d: path("M 0,320 C 300,340 600,380 900,340 C 1200,280 1440,250 1440,250");
+  }
+}
+
+@keyframes curve-anim-2 {
+  0%, 100% {
+    d: path("M 0,480 C 350,450 650,280 950,220 C 1250,190 1440,180 1440,180");
+  }
+  50% {
+    d: path("M 0,350 C 350,370 650,390 950,350 C 1250,300 1440,270 1440,270");
+  }
+}
+
+@keyframes curve-anim-3 {
+  0%, 100% {
+    d: path("M 0,520 C 400,480 700,320 1000,260 C 1300,220 1440,210 1440,210");
+  }
+  50% {
+    d: path("M 0,380 C 400,400 700,410 1000,380 C 1300,340 1440,310 1440,310");
+  }
+}
+
+.animate-curve-1 {
+  animation: curve-anim-1 14s ease-in-out infinite;
+}
+
+.animate-curve-2 {
+  animation: curve-anim-2 18s ease-in-out infinite;
+}
+
+.animate-curve-3 {
+  animation: curve-anim-3 22s ease-in-out infinite;
+}

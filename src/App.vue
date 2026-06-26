@@ -118,6 +118,54 @@ const marqueeItems = computed(() => {
 <template>
   <!-- Screen A: Landing Page -->
   <div v-if="currentPath !== '/app'" class="relative bg-white text-[#003399] min-h-[100dvh] w-full flex flex-col justify-between overflow-hidden select-none font-sans">
+    <!-- Dynamic SVG Yield Curve Background -->
+    <div class="absolute inset-0 w-full h-full pointer-events-none z-0 opacity-30 select-none">
+      <svg class="w-full h-full" viewBox="0 0 1440 600" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Grid lines -->
+        <g stroke="#003399" stroke-opacity="0.05" stroke-dasharray="4 6" stroke-width="1">
+          <!-- Horizontal -->
+          <line x1="0" y1="150" x2="1440" y2="150" />
+          <line x1="0" y1="275" x2="1440" y2="275" />
+          <line x1="0" y1="400" x2="1440" y2="400" />
+          <line x1="0" y1="525" x2="1440" y2="525" />
+          <!-- Vertical -->
+          <line x1="120" y1="0" x2="120" y2="600" />
+          <line x1="420" y1="0" x2="420" y2="600" />
+          <line x1="720" y1="0" x2="720" y2="600" />
+          <line x1="1020" y1="0" x2="1020" y2="600" />
+          <line x1="1320" y1="0" x2="1320" y2="600" />
+        </g>
+
+        <!-- Grid Labels -->
+        <g fill="#003399" fill-opacity="0.18" class="font-mono text-[9px]">
+          <!-- Y-axis -->
+          <text x="15" y="145">4.00%</text>
+          <text x="15" y="270">3.00%</text>
+          <text x="15" y="395">2.00%</text>
+          <text x="15" y="520">1.00%</text>
+          <!-- X-axis -->
+          <text x="125" y="25">3M</text>
+          <text x="425" y="25">2Y</text>
+          <text x="725" y="25">5Y</text>
+          <text x="1025" y="25">10Y</text>
+          <text x="1325" y="25">30Y</text>
+        </g>
+
+        <!-- Dynamic Curves -->
+        <!-- Curve 3 (1 Year Ago - Faintest, dashed) -->
+        <path class="animate-curve-3" fill="none" stroke="#003399" stroke-opacity="0.08" stroke-width="1" stroke-dasharray="3 4"
+              d="M 0,520 C 400,480 700,320 1000,260 C 1300,220 1440,210 1440,210" />
+              
+        <!-- Curve 2 (1 Month Ago - Medium, dashed) -->
+        <path class="animate-curve-2" fill="none" stroke="#003399" stroke-opacity="0.15" stroke-width="1.5" stroke-dasharray="5 5"
+              d="M 0,480 C 350,450 650,280 950,220 C 1250,190 1440,180 1440,180" />
+
+        <!-- Curve 1 (Active/Current - Thickest, solid) -->
+        <path class="animate-curve-1" fill="none" stroke="#003399" stroke-opacity="0.25" stroke-width="2.5"
+              d="M 0,450 C 300,430 600,250 900,200 C 1200,170 1440,160 1440,160" />
+      </svg>
+    </div>
+
     <!-- ASCII Background (Left-aligned, scaling responsively, straight and static) -->
     <div class="absolute inset-y-0 left-0 flex items-center justify-start pointer-events-none select-none z-0 pl-6 sm:pl-12 md:pl-20">
       <pre class="font-mono text-[3vw] md:text-[2.2vw] lg:text-[1.8vw] leading-none text-[#003399]/20 select-none pointer-events-none tracking-tighter">
