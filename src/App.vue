@@ -90,9 +90,9 @@ const formattedLastUpdated = computed(() => {
 <template>
   <!-- Screen A: Landing Page -->
   <div v-if="currentPath !== '/app'" class="relative bg-white text-[#003399] min-h-[100dvh] w-full flex flex-col justify-between overflow-hidden select-none font-sans">
-    <!-- ASCII Background (Centered and scaling responsively) -->
-    <div class="absolute inset-0 flex items-center justify-center pointer-events-none select-none z-0">
-      <pre class="font-mono text-[2.8vw] md:text-[1.8vw] lg:text-[1.3vw] leading-none text-[#003399]/5 select-none pointer-events-none tracking-tighter">
+    <!-- ASCII Background (Left-aligned, scaling responsively) -->
+    <div class="absolute inset-y-0 left-0 flex items-center justify-start pointer-events-none select-none z-0 pl-6 sm:pl-12 md:pl-20">
+      <pre class="font-mono text-[2.8vw] md:text-[1.8vw] lg:text-[1.3vw] leading-none text-[#003399]/8 select-none pointer-events-none tracking-tighter">
            €€€€€€€€€€€
        €€€€€        €€€€
      €€€€
@@ -109,15 +109,8 @@ const formattedLastUpdated = computed(() => {
       </pre>
     </div>
 
-    <!-- Header / Metadata -->
-    <header class="w-full max-w-5xl mx-auto px-6 py-8 flex justify-between items-center z-10">
-      <div class="font-mono text-[9px] tracking-widest uppercase font-semibold text-[#003399]/70">
-        EUROPEAN UNION / MACRO STATISTICS
-      </div>
-      <div class="font-mono text-[9px] border border-[#003399]/15 px-2 py-0.5 text-[#003399]/50">
-        EDITION 2026
-      </div>
-    </header>
+    <!-- Empty Spacer to balance layout without header -->
+    <div class="h-10"></div>
 
     <!-- Main Content -->
     <main class="w-full max-w-4xl mx-auto px-6 flex-grow flex flex-col justify-center items-center text-center z-10 gap-6 my-auto">
@@ -125,7 +118,7 @@ const formattedLastUpdated = computed(() => {
         EuroMetrics
       </h1>
       <p class="font-mono text-[10px] sm:text-xs tracking-wider uppercase text-[#003399]/80 max-w-md leading-relaxed select-none">
-        A minimalist real-time dashboard for Eurozone sovereign yields, macroeconomics, and central bank policy.
+        A real-time dashboard for Eurozone sovereign yields, macroeconomics, and central bank policy.
       </p>
       
       <!-- CTA -->
@@ -143,9 +136,20 @@ const formattedLastUpdated = computed(() => {
     </main>
 
     <!-- Footer -->
-    <footer class="w-full max-w-5xl mx-auto px-6 py-8 flex flex-col sm:flex-row justify-between items-center gap-4 text-[9px] font-mono text-[#003399]/60 z-10 border-t border-[#003399]/10">
-      <span>SOURCE: EUROPEAN CENTRAL BANK & EUROSTAT</span>
-      <span>© {{ new Date().getFullYear() }} EUROMETRICS</span>
+    <footer class="w-full max-w-5xl mx-auto px-6 py-8 flex flex-col sm:flex-row justify-between items-center gap-6 text-[9px] font-mono text-[#003399]/60 z-10 border-t border-[#003399]/10">
+      <div class="flex flex-col sm:flex-row items-center gap-2 sm:gap-4">
+        <span>© {{ new Date().getFullYear() }} EUROMETRICS</span>
+        <span class="hidden sm:inline">·</span>
+        <span>OFFICIAL DATA SOURCES</span>
+      </div>
+      <div class="flex items-center gap-6">
+        <a href="https://ec.europa.eu/eurostat" target="_blank" rel="noopener noreferrer" class="transition-opacity hover:opacity-100 opacity-70">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/e/e0/Eurostat_logo.svg" alt="Eurostat" class="h-5 object-contain" />
+        </a>
+        <a href="https://www.ecb.europa.eu" target="_blank" rel="noopener noreferrer" class="transition-opacity hover:opacity-100 opacity-70">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/b/b7/Logo_European_Central_Bank.svg" alt="ECB" class="h-6 object-contain" />
+        </a>
+      </div>
     </footer>
   </div>
 
