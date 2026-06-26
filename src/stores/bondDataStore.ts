@@ -48,6 +48,7 @@ export const useBondDataStore = defineStore('bondData', () => {
   
   const isLoading = ref<boolean>(false);
   const error = ref<string | null>(null);
+  const lastUpdated = ref<number | null>(null);
 
   // Load from sessionStorage cache on init
   const loadCache = (): boolean => {
@@ -69,6 +70,7 @@ export const useBondDataStore = defineStore('bondData', () => {
           gdpGrowthData.value = parsed.gdpGrowth || null;
           policyRatesData.value = parsed.policyRates || null;
           exchangeRatesData.value = parsed.exchangeRates || null;
+          lastUpdated.value = parsed.timestamp;
           return true;
         }
       }
@@ -154,6 +156,7 @@ export const useBondDataStore = defineStore('bondData', () => {
       gdpGrowthData.value = gdpGrowth;
       policyRatesData.value = policyRates;
       exchangeRatesData.value = exchangeRates;
+      lastUpdated.value = Date.now();
 
       saveCache();
       console.log('Successfully fetched and cached bond, bank, and GDP data.');
@@ -180,6 +183,7 @@ export const useBondDataStore = defineStore('bondData', () => {
     exchangeRatesData,
     isLoading,
     error,
+    lastUpdated,
     fetchAllData,
   };
 });

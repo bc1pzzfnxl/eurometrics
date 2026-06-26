@@ -49,6 +49,18 @@ const screen1Style = computed(() => {
     transform: `scale(${scaleVal})`,
   };
 });
+
+const formattedLastUpdated = computed(() => {
+  if (!dataStore.lastUpdated) return '';
+  const date = new Date(dataStore.lastUpdated);
+  const pad = (num: number) => String(num).padStart(2, '0');
+  const yyyy = date.getFullYear();
+  const mm = pad(date.getMonth() + 1);
+  const dd = pad(date.getDate());
+  const hh = pad(date.getHours());
+  const min = pad(date.getMinutes());
+  return `${yyyy}-${mm}-${dd} ${hh}:${min}`;
+});
 </script>
 
 <template>
@@ -60,9 +72,19 @@ const screen1Style = computed(() => {
     >
       <!-- Header -->
       <header class="flex flex-col sm:flex-row items-center justify-between p-4 sm:p-3 border-b border-border select-none bg-background gap-3">
-        <h1 class="font-sans font-semibold tracking-wider text-sm uppercase self-start sm:self-auto">
-          EuroMetrics
-        </h1>
+        <div class="flex flex-col min-[400px]:flex-row min-[400px]:items-baseline gap-1 min-[400px]:gap-3 self-start sm:self-auto">
+          <h1 class="font-sans font-semibold tracking-wider text-sm uppercase">
+            EuroMetrics
+          </h1>
+          <span 
+            v-if="formattedLastUpdated"
+            class="font-mono text-[9px] text-text-muted tracking-tight select-none uppercase inline-flex items-center gap-1.5"
+            title="Last successful synchronization with ECB & Eurostat APIs"
+          >
+            <span class="w-1 h-1 rounded-full bg-emerald-500 dark:bg-emerald-400 inline-block"></span>
+            Sync: {{ formattedLastUpdated }}
+          </span>
+        </div>
         
         <!-- Navigation Tabs -->
         <nav class="flex items-center gap-1 border border-border p-0.5 bg-surface/50 font-mono text-[10px] md:text-xs">
