@@ -1,0 +1,4 @@
+/*
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  Content-Security-Policy: default-src 'self'; connect-src 'self' data-api.ecb.europa.eu ec.europa.eu; font-src 'self' fonts.gstatic.com; style-src 'self' 'unsafe-inline' fonts.googleapis.com

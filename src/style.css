@@ -1,0 +1,60 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+  
+  --color-background: var(--bg);
+  --color-foreground: var(--text-primary);
+  --color-surface: var(--surface);
+  --color-border: var(--border);
+  --color-text-primary: var(--text-primary);
+  --color-text-muted: var(--text-muted);
+  --color-accent-custom: var(--accent);
+
+  /* Shadcn mappings */
+  --color-popover: var(--bg);
+  --color-popover-foreground: var(--text-primary);
+  --color-card: var(--surface);
+  --color-card-foreground: var(--text-primary);
+  --color-muted: var(--surface);
+  --color-muted-foreground: var(--text-muted);
+  --color-accent: var(--surface);
+  --color-accent-foreground: var(--text-primary);
+  --color-primary: var(--text-primary);
+  --color-primary-foreground: var(--bg);
+  
+  --radius-lg: 0px;
+  --radius-md: 0px;
+  --radius-sm: 0px;
+}
+
+:root {
+  --bg: #FFFFFF;
+  --surface: #F5F5F5;
+  --border: #E5E5E5;
+  --text-primary: #0A0A0A;
+  --text-muted: #6B6B6B;
+  --accent: #0A0A0A;
+}
+
+.dark {
+  --bg: #0A0A0A;
+  --surface: #111111;
+  --border: #1F1F1F;
+  --text-primary: #F5F5F5;
+  --text-muted: #6B6B6B;
+  --accent: #F5F5F5;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+  }
+  code, .mono-data {
+    @apply font-mono;
+  }
+}
