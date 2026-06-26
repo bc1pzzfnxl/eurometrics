@@ -90,23 +90,24 @@ const formattedLastUpdated = computed(() => {
 <template>
   <!-- Screen A: Landing Page -->
   <div v-if="currentPath !== '/app'" class="relative bg-white text-[#003399] min-h-[100dvh] w-full flex flex-col justify-between overflow-hidden select-none font-sans">
-    <!-- ASCII Background (Left-aligned, scaling responsively with Euro symbol and yellow EU stars) -->
+    <!-- ASCII Background (Left-aligned, scaling responsively, with animated text gradient) -->
     <div class="absolute inset-y-0 left-0 flex items-center justify-start pointer-events-none select-none z-0 pl-6 sm:pl-12 md:pl-20">
-      <pre class="font-mono text-[2.5vw] md:text-[1.6vw] lg:text-[1.2vw] leading-none text-[#003399]/20 select-none pointer-events-none tracking-tighter">
-               <span class="text-[#FFCC00]/50">★</span>
-          <span class="text-[#FFCC00]/50">★</span>         <span class="text-[#FFCC00]/50">★</span>
-       <span class="text-[#FFCC00]/50">★</span>               <span class="text-[#FFCC00]/50">★</span>
-            €€€€€€€
-     <span class="text-[#FFCC00]/50">★</span>    €€€     €€€    <span class="text-[#FFCC00]/50">★</span>
-        €€€€
-   <span class="text-[#FFCC00]/50">★</span>   €€€€€€€€€€€€€      <span class="text-[#FFCC00]/50">★</span>
-       €€€€€€€€€€€
-   <span class="text-[#FFCC00]/50">★</span>    €€€€              <span class="text-[#FFCC00]/50">★</span>
-          €€€     €€€
-     <span class="text-[#FFCC00]/50">★</span>      €€€€€€€      <span class="text-[#FFCC00]/50">★</span>
-       <span class="text-[#FFCC00]/50">★</span>               <span class="text-[#FFCC00]/50">★</span>
-          <span class="text-[#FFCC00]/50">★</span>         <span class="text-[#FFCC00]/50">★</span>
-               <span class="text-[#FFCC00]/50">★</span>
+      <pre class="font-mono text-[3vw] md:text-[2.2vw] lg:text-[1.8vw] leading-none select-none pointer-events-none tracking-tighter ascii-gradient-text">
+               €€€€€€€€€€€€€€€€€
+            €€€€€€€€€€€€€€€€€€€€€€
+          €€€€€€              €€€€€
+        €€€€€
+       €€€€€
+   €€€€€€€€€€€€€€€€€€€€€€€€€
+   €€€€€€€€€€€€€€€€€€€€€€€€€
+   €€€€€
+   €€€€€€€€€€€€€€€€€€€€€€€€€
+   €€€€€€€€€€€€€€€€€€€€€€€€€
+   €€€€€
+     €€€€€
+      €€€€€€              €€€€€
+        €€€€€€€€€€€€€€€€€€€€€€
+           €€€€€€€€€€€€€€€€€
       </pre>
     </div>
 
