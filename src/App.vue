@@ -168,7 +168,7 @@ const initGlobe = () => {
       .map(c => {
         return {
           location: [c.lat, c.lng] as [number, number],
-          size: 0.055
+          size: 0.0275
         };
       })
   });
