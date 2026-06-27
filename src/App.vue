@@ -67,8 +67,8 @@ const eurozoneCapitals = [
   { code: 'MT', lat: 35.8989, lng: 14.5146 }
 ];
 
-const currentPhi = ref(0.0); // Align center to prime meridian (0°) to place Europe in the center horizontally
-const currentTheta = ref(0.2); // Tilt Northern hemisphere down (0.2 radians) as requested in the options
+const currentPhi = ref(-0.18); // Focused longitude to bring Europe front and center (10° E)
+const currentTheta = ref(0.85); // Focused tilt looking down on Europe (48° N)
 
 // Cobe Projected coordinates helper matching Cobe's GLSL rotation matrix
 const getMarker2D = (lat: number, lng: number) => {
