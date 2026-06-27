@@ -139,7 +139,7 @@ onMounted(() => {
             <SelectTrigger class="w-[220px] border-border font-mono text-xs text-foreground cursor-pointer rounded-none">
               <SelectValue placeholder="Category" />
             </SelectTrigger>
-            <SelectContent class="border-border bg-background rounded-none">
+            <SelectContent position="popper" class="border-border bg-background rounded-none">
               <SelectGroup>
                 <!-- Rates Tab Categories -->
                 <template v-if="filtersStore.activeTab === 'rates'">
@@ -206,7 +206,7 @@ onMounted(() => {
             <SelectTrigger class="w-[150px] border-border font-mono text-xs text-foreground cursor-pointer rounded-none">
               <SelectValue placeholder="Rating" />
             </SelectTrigger>
-            <SelectContent class="border-border bg-background rounded-none">
+            <SelectContent position="popper" class="border-border bg-background rounded-none">
               <SelectGroup>
                 <SelectItem value="all" class="hover:bg-surface cursor-pointer select-none rounded-none font-mono text-xs">
                   All Sovereign

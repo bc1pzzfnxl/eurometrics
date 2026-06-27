@@ -55,7 +55,7 @@ const maturities: { value: Maturity; label: string }[] = [
       <SelectTrigger class="w-[150px] border-border font-mono text-xs text-foreground cursor-pointer rounded-none">
         <SelectValue placeholder="Maturity" />
       </SelectTrigger>
-      <SelectContent class="border-border bg-background rounded-none">
+      <SelectContent position="popper" class="border-border bg-background rounded-none">
         <SelectGroup>
           <SelectItem
             v-for="mat in maturities"
