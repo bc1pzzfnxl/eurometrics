@@ -67,8 +67,8 @@ const eurozoneCapitals = [
   { code: 'MT', lat: 35.8989, lng: 14.5146 }
 ];
 
-const currentPhi = ref(-10 * Math.PI / 180);
-const currentTheta = ref(50 * Math.PI / 180);
+const currentPhi = ref(0.15); // Focused longitude to bring Europe front and center
+const currentTheta = ref(0.4); // Focused Northern hemisphere tilt looking down on Europe
 
 // Cobe Projected coordinates helper matching Cobe's GLSL rotation matrix
 const getMarker2D = (lat: number, lng: number) => {
@@ -99,14 +99,15 @@ const getMarker2D = (lat: number, lng: number) => {
 };
 
 // 6 largest Eurozone countries (€) for displaying 10Y Yield tooltips
+// We include custom horizontal (tx) translate offsets and vertical heights (hVal) to stagger and prevent overlaps
 const featuredBonds = computed(() => {
   const list = [
-    { code: 'DE', name: 'Germany', city: 'Berlin', lat: 52.5200, lng: 13.4050, fallback: '2.40%' },
-    { code: 'FR', name: 'France', city: 'Paris', lat: 48.8566, lng: 2.3522, fallback: '3.05%' },
-    { code: 'IT', name: 'Italy', city: 'Rome', lat: 41.9028, lng: 12.4964, fallback: '3.85%' },
-    { code: 'ES', name: 'Spain', city: 'Madrid', lat: 40.4168, lng: -3.7038, fallback: '3.20%' },
-    { code: 'NL', name: 'Netherlands', city: 'Amsterdam', lat: 52.3676, lng: 4.9041, fallback: '2.65%' },
-    { code: 'BE', name: 'Belgium', city: 'Brussels', lat: 50.8503, lng: 4.3517, fallback: '2.95%' }
+    { code: 'DE', name: 'Germany', city: 'Berlin', lat: 52.5200, lng: 13.4050, fallback: '2.40%', tx: '-50%', hVal: '6px' },
+    { code: 'FR', name: 'France', city: 'Paris', lat: 48.8566, lng: 2.3522, fallback: '3.05%', tx: '-85%', hVal: '6px' },
+    { code: 'IT', name: 'Italy', city: 'Rome', lat: 41.9028, lng: 12.4964, fallback: '3.85%', tx: '-50%', hVal: '6px' },
+    { code: 'ES', name: 'Spain', city: 'Madrid', lat: 40.4168, lng: -3.7038, fallback: '3.20%', tx: '-50%', hVal: '6px' },
+    { code: 'NL', name: 'Netherlands', city: 'Amsterdam', lat: 52.3676, lng: 4.9041, fallback: '2.65%', tx: '-50%', hVal: '52px' },
+    { code: 'BE', name: 'Belgium', city: 'Brussels', lat: 50.8503, lng: 4.3517, fallback: '2.95%', tx: '-15%', hVal: '28px' }
   ];
 
   return list.map(c => {
@@ -144,7 +145,7 @@ const initGlobe = () => {
     theta: currentTheta.value,
     dark: 0, // Light mode so ocean is white and land is dark!
     diffuse: 1.5,
-    scale: 1.05, // Enlarged scale to separate country cards
+    scale: 1.15, // Enlarged scale to make the globe bigger and separate markers
     mapSamples: 16000,
     mapBrightness: 10,
     baseColor: [1.0, 1.0, 1.0], // White ocean
@@ -310,7 +311,7 @@ const marqueeItems = computed(() => {
     <main class="w-full max-w-5xl mx-auto px-6 flex-grow flex flex-col md:flex-row items-center justify-center gap-8 md:gap-16 z-10 my-auto py-8">
       
       <!-- Left: Interactive WebGL Globe -->
-      <div class="relative w-[340px] h-[340px] sm:w-[420px] sm:h-[420px] md:w-[500px] md:h-[500px] flex items-center justify-center shrink-0">
+      <div class="relative w-[350px] h-[350px] sm:w-[450px] sm:h-[450px] md:w-[540px] md:h-[540px] flex items-center justify-center shrink-0">
         <!-- Background Radial Glow (Soft EU Blue aura behind the light globe) -->
         <div class="absolute inset-0 rounded-full pointer-events-none" style="background: radial-gradient(circle, rgba(0, 51, 153, 0.04) 0%, transparent 70%);"></div>
         <!-- Canvas for Cobe WebGL Globe -->
@@ -320,25 +321,30 @@ const marqueeItems = computed(() => {
           style="width: 100%; height: 100%;"
         ></canvas>
 
-        <!-- Projected HTML Tooltips matching temp.png style -->
+        <!-- Projected HTML Tooltips with staggered vertical connectors -->
         <div 
           v-for="bond in featuredBonds" 
           :key="bond.code"
-          class="absolute pointer-events-none select-none transition-opacity duration-150"
+          class="absolute pointer-events-none select-none transition-opacity duration-150 flex flex-col items-center justify-end"
           :style="{
             left: bond.x + '%',
             top: bond.y + '%',
             opacity: bond.visible ? 1 : 0,
-            transform: 'translate(-50%, -100%) translateY(-6px)'
+            transform: `translate(${bond.tx}, -100%)`
           }"
         >
-          <div class="bg-[#003399] text-white px-2 py-0.5 font-mono text-[8px] sm:text-[9px] font-bold tracking-wider whitespace-nowrap shadow-none rounded-none flex items-center gap-1.5">
+          <!-- Tooltip box -->
+          <div class="bg-[#003399] text-white px-2 py-0.5 font-mono text-[8px] sm:text-[9px] font-bold tracking-wider whitespace-nowrap shadow-none rounded-none flex items-center gap-1.5 z-10">
             <span>{{ bond.name.toUpperCase() }}</span>
             <span class="opacity-50">|</span>
             <span>{{ bond.yield }}</span>
           </div>
-          <!-- Arrow pointing down -->
-          <div class="w-0 h-0 border-l-[3px] border-l-transparent border-r-[3px] border-r-transparent border-t-[3px] border-t-[#003399] absolute left-1/2 -translate-x-1/2 top-full"></div>
+
+          <!-- Staggered vertical connector line & arrow pin pointing at the capital -->
+          <div class="flex flex-col items-center" :style="{ height: bond.hVal }">
+            <div v-if="bond.hVal !== '6px'" class="w-[1px] bg-[#003399]/40 flex-grow"></div>
+            <div class="w-0 h-0 border-l-[3px] border-l-transparent border-r-[3px] border-r-transparent border-t-[3px] border-t-[#003399]"></div>
+          </div>
         </div>
       </div>
 
