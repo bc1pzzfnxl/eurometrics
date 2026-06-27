@@ -77,6 +77,63 @@ const dragStart = ref({ x: 0, y: 0 });
 const dragPhi = ref(0);
 const dragTheta = ref(0);
 
+// Cobe Projected coordinates helper matching Cobe's GLSL rotation matrix
+const getMarker2D = (lat: number, lng: number) => {
+  const GLOBE_R = 0.8;
+  const latRad = lat * Math.PI / 180;
+  const lngRad = lng * Math.PI / 180 - Math.PI;
+  const cosLat = Math.cos(latRad);
+  const x3d = -cosLat * Math.cos(lngRad) * GLOBE_R;
+  const y3d = Math.sin(latRad) * GLOBE_R;
+  const z3d = cosLat * Math.sin(lngRad) * GLOBE_R;
+
+  const cosT = Math.cos(currentTheta.value);
+  const cosP = Math.cos(currentPhi.value);
+  const sinT = Math.sin(currentTheta.value);
+  const sinP = Math.sin(currentPhi.value);
+
+  const projX = cosP * x3d + sinP * z3d;
+  const projY = sinP * sinT * x3d + cosT * y3d - cosP * sinT * z3d;
+  const projZ = -sinP * cosT * x3d + sinT * y3d + cosP * cosT * z3d;
+
+  const xPct = (projX + 1) / 2 * 100;
+  const yPct = (-projY + 1) / 2 * 100;
+
+  // Visible if on the front hemisphere of the globe
+  const visible = projZ > 0;
+
+  return { x: xPct, y: yPct, visible };
+};
+
+// 6 largest Eurozone countries (€) for displaying 10Y Yield tooltips
+const featuredBonds = computed(() => {
+  const list = [
+    { code: 'DE', name: 'Germany', city: 'Berlin', lat: 52.5200, lng: 13.4050, fallback: '2.40%' },
+    { code: 'FR', name: 'France', city: 'Paris', lat: 48.8566, lng: 2.3522, fallback: '3.05%' },
+    { code: 'IT', name: 'Italy', city: 'Rome', lat: 41.9028, lng: 12.4964, fallback: '3.85%' },
+    { code: 'ES', name: 'Spain', city: 'Madrid', lat: 40.4168, lng: -3.7038, fallback: '3.20%' },
+    { code: 'NL', name: 'Netherlands', city: 'Amsterdam', lat: 52.3676, lng: 4.9041, fallback: '2.65%' },
+    { code: 'BE', name: 'Belgium', city: 'Brussels', lat: 50.8503, lng: 4.3517, fallback: '2.95%' }
+  ];
+
+  return list.map(c => {
+    const points = dataStore.countriesData?.[c.code];
+    const yieldVal = points && points.length > 0 
+      ? `${points[points.length - 1].value.toFixed(2)}%` 
+      : c.fallback;
+      
+    const proj = getMarker2D(c.lat, c.lng);
+    
+    return {
+      ...c,
+      yield: yieldVal,
+      x: proj.x,
+      y: proj.y,
+      visible: proj.visible
+    };
+  });
+});
+
 let animationFrameId: number | null = null;
 
 const onPointerDown = (e: PointerEvent) => {
@@ -133,10 +190,13 @@ const initGlobe = () => {
     markerColor: [0.0, 0.2, 0.6], // EU Blue markers
     glowColor: [0.94, 0.93, 0.91], // Soft warm grey 3D edge shading (creates the globe sphere outline)
     offset: [0, 0],
-    markers: eurozoneCapitals.map(c => ({
-      location: [c.lat, c.lng] as [number, number],
-      size: 0.045
-    }))
+    markers: eurozoneCapitals.map(c => {
+      const isFeatured = ['DE', 'FR', 'IT', 'ES', 'NL', 'BE'].includes(c.code);
+      return {
+        location: [c.lat, c.lng] as [number, number],
+        size: isFeatured ? 0.055 : 0.03
+      };
+    })
   });
 
   const animate = () => {
@@ -324,6 +384,27 @@ const marqueeItems = computed(() => {
           class="w-full h-full cursor-grab active:cursor-grabbing opacity-95" 
           style="width: 100%; height: 100%;"
         ></canvas>
+
+        <!-- Projected HTML Tooltips matching temp.png style -->
+        <div 
+          v-for="bond in featuredBonds" 
+          :key="bond.code"
+          class="absolute pointer-events-none select-none transition-opacity duration-150"
+          :style="{
+            left: bond.x + '%',
+            top: bond.y + '%',
+            opacity: bond.visible ? 1 : 0,
+            transform: 'translate(-50%, -100%) translateY(-6px)'
+          }"
+        >
+          <div class="bg-[#003399] text-white px-2 py-0.5 font-mono text-[8px] sm:text-[9px] font-bold tracking-wider whitespace-nowrap shadow-none rounded-none flex items-center gap-1.5">
+            <span>{{ bond.city.toUpperCase() }}</span>
+            <span class="opacity-50">|</span>
+            <span>{{ bond.yield }}</span>
+          </div>
+          <!-- Arrow pointing down -->
+          <div class="w-0 h-0 border-l-[3px] border-l-transparent border-r-[3px] border-r-transparent border-t-[3px] border-t-[#003399] absolute left-1/2 -translate-x-1/2 top-full"></div>
+        </div>
       </div>
 
       <!-- Right: Main Branding & Call to Action -->
