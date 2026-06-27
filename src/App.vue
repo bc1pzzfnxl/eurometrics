@@ -36,6 +36,13 @@ const handleScroll = () => {
   scrollY.value = window.scrollY;
 };
 
+const scrollToInfo = () => {
+  window.scrollTo({
+    top: windowHeight.value * 0.95,
+    behavior: 'smooth'
+  });
+};
+
 const handleResize = () => {
   windowHeight.value = window.innerHeight;
 };
@@ -555,6 +562,19 @@ const marqueeItems = computed(() => {
       <!-- Chart Area -->
       <main class="flex-grow flex flex-col w-full min-h-0 relative">
         <BondChart />
+        
+        <!-- Scroll Indicator -->
+        <div 
+          @click="scrollToInfo"
+          class="absolute bottom-3 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 cursor-pointer select-none font-mono text-[9px] tracking-widest text-text-muted hover:text-text-primary transition-all duration-300 z-10"
+          :style="{
+            opacity: Math.max(0, 1 - (scrollY / 150)),
+            pointerEvents: scrollY > 100 ? 'none' : 'auto'
+          }"
+        >
+          <span class="animate-pulse">SCROLL FOR DETAILS</span>
+          <span class="text-xs animate-bounce mt-0.5">↓</span>
+        </div>
       </main>
     </div>
 
