@@ -584,9 +584,9 @@ const marqueeItems = computed(() => {
         
         <!-- Info Cards -->
         <div class="flex flex-col gap-6 leading-relaxed">
-          <!-- Card 1 -->
+          <!-- Card 1: Data Sources -->
           <div class="flex flex-col md:flex-row items-start gap-4 md:gap-6 p-5 border border-border bg-surface/50">
-            <div class="flex items-center gap-2 text-text-primary font-bold shrink-0 bg-surface px-3 py-1.5 border border-border text-xs md:text-sm">
+            <div class="flex items-center gap-2 text-text-primary font-bold shrink-0 bg-surface px-3 py-1.5 border border-border text-[10px] md:text-xs tracking-wider">
               <span>ⓘ</span>
               <span>DATA SOURCES</span>
             </div>
@@ -595,9 +595,9 @@ const marqueeItems = computed(() => {
             </p>
           </div>
           
-          <!-- Card 2 -->
+          <!-- Card 2: Maastricht Bounds -->
           <div class="flex flex-col md:flex-row items-start gap-4 md:gap-6 p-5 border border-border bg-surface/50">
-            <div class="flex items-center gap-2 text-text-primary font-bold shrink-0 bg-surface px-3 py-1.5 border border-border text-xs md:text-sm">
+            <div class="flex items-center gap-2 text-text-primary font-bold shrink-0 bg-surface px-3 py-1.5 border border-border text-[10px] md:text-xs tracking-wider">
               <span>ⓘ</span>
               <span>MAASTRICHT BOUNDS</span>
             </div>
@@ -605,60 +605,84 @@ const marqueeItems = computed(() => {
               Under the Maastricht Treaty's long-term interest rate convergence criterion (Article 140 TFEU), a Member State's nominal 10-year government bond yield must not exceed by more than <strong>2 percentage points</strong> the average yield of the three best-performing EU Member States in terms of price stability (lowest inflation) over a one-year reference period.
             </p>
           </div>
-          
-          <!-- Card 3 -->
+
+          <!-- Card 3: Theme 1 -->
           <div class="flex flex-col md:flex-row items-start gap-4 md:gap-6 p-5 border border-border bg-surface/50">
-            <div class="flex items-center gap-2 text-text-primary font-bold shrink-0 bg-surface px-3 py-1.5 border border-border text-xs md:text-sm">
-              <span>ⓘ</span>
-              <span>BANK RATES (MIR)</span>
+            <div class="flex items-center gap-2 text-text-primary font-bold shrink-0 bg-surface px-3 py-1.5 border border-border text-[10px] md:text-xs tracking-wider">
+              <span>01</span>
+              <span>RATES & YIELDS</span>
             </div>
-            <p class="text-sm md:text-base text-text-muted">
-              Bank mortgage, corporate loan, and deposit rates are sourced from the ECB's <strong>MFI Interest Rate Statistics (MIR)</strong>. These represent annualized agreed rates applied by monetary financial institutions (commercial banks) to new euro-denominated retail business, providing a direct comparison of borrowing costs and savings returns across Eurozone economies.
-            </p>
+            <div class="text-sm md:text-base text-text-muted flex flex-col gap-3 w-full">
+              <p>Provides a direct comparison of government and commercial banking interest rates across the Eurozone:</p>
+              <ul class="list-disc pl-5 space-y-2 text-xs md:text-sm">
+                <li><strong>Sovereign Bonds (10Y)</strong>: Benchmark government bond yields from the Maastricht Convergence series (monthly). Represents long-term borrowing costs for states.</li>
+                <li><strong>Bank Mortgages</strong>: Annualized agreed rate applied by commercial banks to new home loans for households (monthly, ECB MIR).</li>
+                <li><strong>Bank Corporate Loans</strong>: Annualized agreed rate applied by commercial banks to new loans for non-financial corporations (monthly, ECB MIR).</li>
+                <li><strong>Bank Deposits</strong>: Annualized agreed rate applied by commercial banks to new household deposits with agreed maturity (monthly, ECB MIR).</li>
+              </ul>
+            </div>
           </div>
 
-          <!-- Card 4 -->
+          <!-- Card 4: Theme 2 -->
           <div class="flex flex-col md:flex-row items-start gap-4 md:gap-6 p-5 border border-border bg-surface/50">
-            <div class="flex items-center gap-2 text-text-primary font-bold shrink-0 bg-surface px-3 py-1.5 border border-border text-xs md:text-sm">
-              <span>ⓘ</span>
-              <span>MACROECONOMICS</span>
+            <div class="flex items-center gap-2 text-text-primary font-bold shrink-0 bg-surface px-3 py-1.5 border border-border text-[10px] md:text-xs tracking-wider">
+              <span>02</span>
+              <span>MACRO & CONVERGENCE</span>
             </div>
-            <p class="text-sm md:text-base text-text-muted">
-              HICP YoY Inflation is sourced from the ECB's <strong>Harmonised Index of Consumer Prices (ICP)</strong>. GDP growth rate (YoY % change) and monthly Unemployment rate (%) are sourced from <strong>Eurostat</strong> datasets, reflecting standard macroeconomic indicators.
-            </p>
+            <div class="text-sm md:text-base text-text-muted flex flex-col gap-3 w-full">
+              <p>Tracks real economic activity, labor markets, and price stability indicators:</p>
+              <ul class="list-disc pl-5 space-y-2 text-xs md:text-sm">
+                <li><strong>HICP Inflation</strong>: Harmonised Index of Consumer Prices YoY percentage change (monthly, ECB ICP). Measures price stability in accordance with ECB mandates.</li>
+                <li><strong>Unemployment Rate</strong>: Monthly unemployment rate (%) seasonally adjusted (monthly, Eurostat). Reflects the share of the active labor force unable to find work.</li>
+                <li><strong>GDP Growth %</strong>: Real GDP growth rate, percentage change compared to the same quarter of the previous year (quarterly, Eurostat).</li>
+              </ul>
+            </div>
           </div>
 
-          <!-- Card 5 -->
+          <!-- Card 5: Theme 3 -->
           <div class="flex flex-col md:flex-row items-start gap-4 md:gap-6 p-5 border border-border bg-surface/50">
-            <div class="flex items-center gap-2 text-text-primary font-bold shrink-0 bg-surface px-3 py-1.5 border border-border text-xs md:text-sm">
-              <span>ⓘ</span>
+            <div class="flex items-center gap-2 text-text-primary font-bold shrink-0 bg-surface px-3 py-1.5 border border-border text-[10px] md:text-xs tracking-wider">
+              <span>03</span>
               <span>MONETARY & FOREX</span>
             </div>
-            <p class="text-sm md:text-base text-text-muted">
-              The ECB's key interest policy rate corridor is sourced daily from the ECB's <strong>Financial Market Statistics (FM)</strong>, representing the marginal lending, main refinancing, and deposit facility rates. EUR monthly exchange rates are sourced from the ECB's <strong>Foreign Exchange Rates (EXR)</strong> database.
-            </p>
+            <div class="text-sm md:text-base text-text-muted flex flex-col gap-3 w-full">
+              <p>Central bank policy stances and international currency values:</p>
+              <ul class="list-disc pl-5 space-y-2 text-xs md:text-sm">
+                <li><strong>ECB Policy Rates</strong>: Sourced daily from ECB Financial Market Statistics. Includes the Deposit Facility Rate (DFR, floor), Main Refinancing Operations rate (MRR, middle), and Marginal Lending Facility rate (MLFR, ceiling).</li>
+                <li><strong>EUR Exchange Rates</strong>: Sourced monthly from ECB Foreign Exchange Rates (EXR). Tracks the value of the Euro against major global currencies (USD, GBP, CHF, JPY).</li>
+              </ul>
+            </div>
           </div>
 
-          <!-- Card 6 -->
+          <!-- Card 6: Theme 4 -->
           <div class="flex flex-col md:flex-row items-start gap-4 md:gap-6 p-5 border border-border bg-surface/50">
-            <div class="flex items-center gap-2 text-text-primary font-bold shrink-0 bg-surface px-3 py-1.5 border border-border text-xs md:text-sm">
-              <span>ⓘ</span>
+            <div class="flex items-center gap-2 text-text-primary font-bold shrink-0 bg-surface px-3 py-1.5 border border-border text-[10px] md:text-xs tracking-wider">
+              <span>04</span>
               <span>FINANCIAL STABILITY</span>
             </div>
-            <p class="text-sm md:text-base text-text-muted">
-              General government deficit/surplus (% of GDP) is sourced quarterly from Eurostat's <strong>General Government Accounts</strong> (Maastricht Treaty deficit limit is <strong>3%</strong>). Government debt-to-GDP is sourced from the ECB's <strong>Government Finance Statistics (GFS)</strong> (Maastricht criteria limit is <strong>60%</strong>).
-            </p>
+            <div class="text-sm md:text-base text-text-muted flex flex-col gap-3 w-full">
+              <p>Monitors sovereign fiscal health and convergence criteria limits under the Stability and Growth Pact:</p>
+              <ul class="list-disc pl-5 space-y-2 text-xs md:text-sm">
+                <li><strong>Government Deficit %</strong>: General government net lending (+) / net borrowing (-) as a percentage of GDP (quarterly, Eurostat, seasonally adjusted `SCA`). The official Maastricht Treaty deficit limit is <strong>3%</strong>.</li>
+                <li><strong>Government Debt %</strong>: General government gross debt-to-GDP ratio (quarterly, ECB GFS). The official Maastricht Treaty debt limit is <strong>60%</strong>.</li>
+              </ul>
+            </div>
           </div>
 
-          <!-- Card 7 -->
+          <!-- Card 7: Theme 5 -->
           <div class="flex flex-col md:flex-row items-start gap-4 md:gap-6 p-5 border border-border bg-surface/50">
-            <div class="flex items-center gap-2 text-text-primary font-bold shrink-0 bg-surface px-3 py-1.5 border border-border text-xs md:text-sm">
-              <span>ⓘ</span>
+            <div class="flex items-center gap-2 text-text-primary font-bold shrink-0 bg-surface px-3 py-1.5 border border-border text-[10px] md:text-xs tracking-wider">
+              <span>05</span>
               <span>ACTIVITY & CONSUMPTION</span>
             </div>
-            <p class="text-sm md:text-base text-text-muted">
-              Retail Sales YoY Growth is sourced monthly from Eurostat's <strong>Short-term Business Statistics (STS)</strong>. Consumer Confidence balances are sourced monthly from Eurostat's <strong>Business and Consumer Surveys</strong>. Household Saving Rate is sourced quarterly from Eurostat's <strong>Quarterly Sector Accounts</strong>.
-            </p>
+            <div class="text-sm md:text-base text-text-muted flex flex-col gap-3 w-full">
+              <p>Highlights monthly retail activity, household confidence surveys, and savings habits:</p>
+              <ul class="list-disc pl-5 space-y-2 text-xs md:text-sm">
+                <li><strong>Retail Sales Growth</strong>: Real volume of retail trade index, percentage change on the same period of the previous year (monthly, Eurostat, calendar adjusted `CA`). Reflects direct consumer spending momentum.</li>
+                <li><strong>Consumer Confidence</strong>: Harmonised monthly survey balance tracking consumers' household and general economic expectations (monthly, Eurostat, seasonally adjusted `SA`).</li>
+                <li><strong>Household Saving Rate</strong>: Gross savings of households as a percentage of gross disposable income (quarterly, Eurostat, seasonally adjusted `SCA`).</li>
+              </ul>
+            </div>
           </div>
         </div>
 
