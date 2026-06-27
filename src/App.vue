@@ -208,11 +208,17 @@ watch(currentPath, async (newPath) => {
   } else {
     destroyGlobe();
   }
-}, { immediate: true });
+});
 
 onMounted(() => {
   // Always load API data in the background to prime the cache and populate the marquee
   dataStore.fetchAllData();
+
+  if (currentPath.value !== '/app') {
+    nextTick(() => {
+      initGlobe();
+    });
+  }
 
   window.addEventListener('popstate', handlePopState);
   window.addEventListener('keydown', handleKeyDown);
