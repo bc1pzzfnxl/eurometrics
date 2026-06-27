@@ -557,7 +557,7 @@ export async function fetchDeficit(): Promise<Record<string, DataPoint[]>> {
   const eurostatCountries = EUROZONE_COUNTRIES.map(c => c === 'GR' ? 'EL' : c);
   const queryCountries = [...eurostatCountries, 'EA20', 'EA21', 'EA'];
   const geoQuery = queryCountries.map(c => `geo=${c}`).join('&');
-  const url = `${EUROSTAT_BASE_URL}/gov_10q_ggnfa?format=JSON&lang=EN&${geoQuery}&na_item=B9&sector=S13&unit=PC_GDP`;
+  const url = `${EUROSTAT_BASE_URL}/gov_10q_ggnfa?format=JSON&lang=EN&${geoQuery}&na_item=B9&sector=S13&unit=PC_GDP&s_adj=SCA`;
   try {
     console.log('Fetching government deficit/surplus from Eurostat...');
     const response = await ofetch<EurostatResponse>(url, {
