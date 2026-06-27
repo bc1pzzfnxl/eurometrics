@@ -102,22 +102,22 @@ const getMarker2D = (lat: number, lng: number) => {
 // We include custom horizontal shifts (shiftX) and vertical heights (hVal) to stagger and prevent overlaps
 const featuredBonds = computed(() => {
   const list = [
-    { code: 'DE', name: 'Germany', city: 'Berlin', lat: 52.5200, lng: 13.4050, fallback: '2.40%', shiftX: '26px', hVal: '24px' },
-    { code: 'FR', name: 'France', city: 'Paris', lat: 48.8566, lng: 2.3522, fallback: '3.05%', shiftX: '20px', hVal: '6px' },
-    { code: 'IT', name: 'Italy', city: 'Rome', lat: 41.9028, lng: 12.4964, fallback: '3.85%', shiftX: '15px', hVal: '6px' },
-    { code: 'ES', name: 'Spain', city: 'Madrid', lat: 40.4168, lng: -3.7038, fallback: '3.20%', shiftX: '24px', hVal: '6px' },
-    { code: 'NL', name: 'Netherlands', city: 'Amsterdam', lat: 52.3676, lng: 4.9041, fallback: '2.65%', shiftX: null, hVal: '74px' },
-    { code: 'BE', name: 'Belgium', city: 'Brussels', lat: 50.8503, lng: 4.3517, fallback: '2.95%', shiftX: '-46px', hVal: '38px' },
-    { code: 'PT', name: 'Portugal', city: 'Lisbon', lat: 38.7223, lng: -9.1393, fallback: '3.15%', shiftX: '-24px', hVal: '6px' },
-    { code: 'IE', name: 'Ireland', city: 'Dublin', lat: 53.3498, lng: -6.2603, fallback: '2.80%', shiftX: null, hVal: '6px' },
-    { code: 'AT', name: 'Austria', city: 'Vienna', lat: 48.2082, lng: 16.3738, fallback: '2.75%', shiftX: '-38px', hVal: '6px' },
-    { code: 'FI', name: 'Finland', city: 'Helsinki', lat: 60.1699, lng: 24.9384, fallback: '2.70%', shiftX: '-28px', hVal: '6px' },
-    { code: 'GR', name: 'Greece', city: 'Athens', lat: 37.9838, lng: 23.7275, fallback: '3.60%', shiftX: null, hVal: '6px' },
-    { code: 'SK', name: 'Slovakia', city: 'Bratislava', lat: 48.1486, lng: 17.1077, fallback: '3.10%', shiftX: '38px', hVal: '28px' },
-    { code: 'SI', name: 'Slovenia', city: 'Ljubljana', lat: 46.0569, lng: 14.5058, fallback: '3.00%', shiftX: '-36px', hVal: '44px' },
-    { code: 'HR', name: 'Croatia', city: 'Zagreb', lat: 45.8150, lng: 15.9819, fallback: '3.30%', shiftX: '36px', hVal: '58px' },
-    { code: 'LT', name: 'Lithuania', city: 'Vilnius', lat: 54.6872, lng: 25.2797, fallback: '3.15%', shiftX: '20px', hVal: '6px' },
-    { code: 'EE', name: 'Estonia', city: 'Tallinn', lat: 59.4370, lng: 24.7535, fallback: '3.10%', shiftX: '28px', hVal: '6px' }
+    { code: 'DE', name: 'Germany', city: 'Berlin', lat: 52.5200, lng: 13.4050, fallback: '2.40%', shiftX: '26px', hVal: '24px', desktopOnly: false },
+    { code: 'FR', name: 'France', city: 'Paris', lat: 48.8566, lng: 2.3522, fallback: '3.05%', shiftX: '20px', hVal: '6px', desktopOnly: false },
+    { code: 'IT', name: 'Italy', city: 'Rome', lat: 41.9028, lng: 12.4964, fallback: '3.85%', shiftX: '15px', hVal: '6px', desktopOnly: false },
+    { code: 'ES', name: 'Spain', city: 'Madrid', lat: 40.4168, lng: -3.7038, fallback: '3.20%', shiftX: '24px', hVal: '6px', desktopOnly: false },
+    { code: 'NL', name: 'Netherlands', city: 'Amsterdam', lat: 52.3676, lng: 4.9041, fallback: '2.65%', shiftX: null, hVal: '74px', desktopOnly: false },
+    { code: 'BE', name: 'Belgium', city: 'Brussels', lat: 50.8503, lng: 4.3517, fallback: '2.95%', shiftX: '-46px', hVal: '38px', desktopOnly: false },
+    { code: 'PT', name: 'Portugal', city: 'Lisbon', lat: 38.7223, lng: -9.1393, fallback: '3.15%', shiftX: '-24px', hVal: '6px', desktopOnly: true },
+    { code: 'IE', name: 'Ireland', city: 'Dublin', lat: 53.3498, lng: -6.2603, fallback: '2.80%', shiftX: null, hVal: '6px', desktopOnly: true },
+    { code: 'AT', name: 'Austria', city: 'Vienna', lat: 48.2082, lng: 16.3738, fallback: '2.75%', shiftX: '-38px', hVal: '6px', desktopOnly: true },
+    { code: 'FI', name: 'Finland', city: 'Helsinki', lat: 60.1699, lng: 24.9384, fallback: '2.70%', shiftX: '-28px', hVal: '6px', desktopOnly: true },
+    { code: 'GR', name: 'Greece', city: 'Athens', lat: 37.9838, lng: 23.7275, fallback: '3.60%', shiftX: null, hVal: '6px', desktopOnly: true },
+    { code: 'SK', name: 'Slovakia', city: 'Bratislava', lat: 48.1486, lng: 17.1077, fallback: '3.10%', shiftX: '38px', hVal: '28px', desktopOnly: true },
+    { code: 'SI', name: 'Slovenia', city: 'Ljubljana', lat: 46.0569, lng: 14.5058, fallback: '3.00%', shiftX: '-36px', hVal: '44px', desktopOnly: true },
+    { code: 'HR', name: 'Croatia', city: 'Zagreb', lat: 45.8150, lng: 15.9819, fallback: '3.30%', shiftX: '36px', hVal: '58px', desktopOnly: true },
+    { code: 'LT', name: 'Lithuania', city: 'Vilnius', lat: 54.6872, lng: 25.2797, fallback: '3.15%', shiftX: '20px', hVal: '6px', desktopOnly: true },
+    { code: 'EE', name: 'Estonia', city: 'Tallinn', lat: 59.4370, lng: 24.7535, fallback: '3.10%', shiftX: '28px', hVal: '6px', desktopOnly: true }
   ];
 
   return list.map(c => {
@@ -362,6 +362,7 @@ const marqueeItems = computed(() => {
           v-for="bond in featuredBonds" 
           :key="bond.code"
           class="absolute pointer-events-none select-none transition-opacity duration-150 flex flex-col items-center justify-end"
+          :class="[bond.desktopOnly ? 'hidden md:flex' : 'flex']"
           :style="{
             left: bond.x + '%',
             top: bond.y + '%',
@@ -383,7 +384,7 @@ const marqueeItems = computed(() => {
 
           <!-- Staggered vertical connector line & arrow pin pointing at the capital -->
           <div class="flex flex-col items-center" :style="{ height: bond.hVal }">
-            <div v-if="bond.hVal !== '6px'" class="w-[1px] bg-[#003399]/40 flex-grow"></div>
+            <div v-if="bond.hVal !== '6px'" class="w-[1.5px] bg-[#003399]/70 flex-grow"></div>
             <div class="w-0 h-0 border-l-[3px] border-l-transparent border-r-[3px] border-r-transparent border-t-[3px] border-t-[#003399]"></div>
           </div>
         </div>
