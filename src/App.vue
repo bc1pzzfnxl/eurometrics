@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref, computed } from 'vue';
+import { onMounted, onUnmounted, ref, computed, watch, nextTick } from 'vue';
+import createGlobe from 'cobe';
 import { useBondDataStore } from './stores/bondDataStore';
 import { useFiltersStore } from './stores/filtersStore';
 import ControlBar from './components/ControlBar.vue';
@@ -39,6 +40,206 @@ const handleResize = () => {
   windowHeight.value = window.innerHeight;
 };
 
+// Cobe Globe Configuration & State
+const globeCanvas = ref<HTMLCanvasElement | null>(null);
+let globe: any = null;
+
+const featuredCountries = [
+  { code: 'DE', name: 'Germany', lat: 52.5200, lng: 13.4050 },
+  { code: 'FR', name: 'France', lat: 48.8566, lng: 2.3522 },
+  { code: 'IT', name: 'Italy', lat: 41.9028, lng: 12.4964 },
+  { code: 'ES', name: 'Spain', lat: 40.4168, lng: -3.7038 },
+  { code: 'IE', name: 'Ireland', lat: 53.3498, lng: -6.2603 },
+  { code: 'NL', name: 'Netherlands', lat: 52.3676, lng: 4.9041 },
+  { code: 'GR', name: 'Greece', lat: 37.9838, lng: 23.7275 }
+];
+
+const eurozoneCapitals = [
+  { code: 'DE', lat: 52.5200, lng: 13.4050 },
+  { code: 'FR', lat: 48.8566, lng: 2.3522 },
+  { code: 'IT', lat: 41.9028, lng: 12.4964 },
+  { code: 'ES', lat: 40.4168, lng: -3.7038 },
+  { code: 'NL', lat: 52.3676, lng: 4.9041 },
+  { code: 'BE', lat: 50.8503, lng: 4.3517 },
+  { code: 'AT', lat: 48.2082, lng: 16.3738 },
+  { code: 'PT', lat: 38.7223, lng: -9.1393 },
+  { code: 'GR', lat: 37.9838, lng: 23.7275 },
+  { code: 'IE', lat: 53.3498, lng: -6.2603 },
+  { code: 'FI', lat: 60.1699, lng: 24.9384 },
+  { code: 'SK', lat: 48.1486, lng: 17.1077 },
+  { code: 'HR', lat: 45.8150, lng: 15.9819 },
+  { code: 'LT', lat: 54.6872, lng: 25.2797 },
+  { code: 'SI', lat: 46.0569, lng: 14.5058 },
+  { code: 'LV', lat: 56.9496, lng: 24.1052 },
+  { code: 'EE', lat: 59.4370, lng: 24.7536 },
+  { code: 'CY', lat: 35.1856, lng: 33.3823 },
+  { code: 'LU', lat: 49.6116, lng: 6.1319 },
+  { code: 'MT', lat: 35.8989, lng: 14.5146 }
+];
+
+const activeCountryCode = ref('DE');
+const activeCountry = computed(() => {
+  return featuredCountries.find(c => c.code === activeCountryCode.value) || featuredCountries[0];
+});
+
+const currentCountryYield = computed(() => {
+  const code = activeCountryCode.value;
+  const points = dataStore.countriesData?.[code];
+  if (!points || points.length === 0) {
+    const fallbacks: Record<string, string> = {
+      DE: '2.40%',
+      FR: '3.05%',
+      IT: '3.85%',
+      ES: '3.20%',
+      IE: '2.80%',
+      NL: '2.65%',
+      GR: '3.60%'
+    };
+    return fallbacks[code] || '—';
+  }
+  const latest = points[points.length - 1];
+  return `${latest.value.toFixed(2)}%`;
+});
+
+const currentPhi = ref(0.2);
+const targetPhi = ref(0.2);
+const currentTheta = ref(0.8);
+const targetTheta = ref(0.8);
+
+const isDragging = ref(false);
+const dragStart = ref({ x: 0, y: 0 });
+const dragPhi = ref(0);
+const dragTheta = ref(0);
+
+let autoCycleTimer: any = null;
+let resumeTimer: any = null;
+
+const startAutoCycle = () => {
+  stopAutoCycle();
+  autoCycleTimer = setInterval(() => {
+    const currentIndex = featuredCountries.findIndex(c => c.code === activeCountryCode.value);
+    const nextIndex = (currentIndex + 1) % featuredCountries.length;
+    activeCountryCode.value = featuredCountries[nextIndex].code;
+  }, 3500);
+};
+
+const stopAutoCycle = () => {
+  if (autoCycleTimer) {
+    clearInterval(autoCycleTimer);
+    autoCycleTimer = null;
+  }
+};
+
+const selectCountry = (c: typeof featuredCountries[0]) => {
+  activeCountryCode.value = c.code;
+  stopAutoCycle();
+  
+  if (resumeTimer) clearTimeout(resumeTimer);
+  resumeTimer = setTimeout(() => {
+    startAutoCycle();
+  }, 10000);
+};
+
+const onPointerDown = (e: PointerEvent) => {
+  isDragging.value = true;
+  dragStart.value = { x: e.clientX, y: e.clientY };
+  dragPhi.value = currentPhi.value;
+  dragTheta.value = currentTheta.value;
+  stopAutoCycle();
+  if (resumeTimer) clearTimeout(resumeTimer);
+};
+
+const onPointerMove = (e: PointerEvent) => {
+  if (!isDragging.value) return;
+  const dx = e.clientX - dragStart.value.x;
+  const dy = e.clientY - dragStart.value.y;
+  targetPhi.value = dragPhi.value - dx / 250;
+  targetTheta.value = Math.max(-0.6, Math.min(1.2, dragTheta.value + dy / 250));
+};
+
+const onPointerUp = () => {
+  isDragging.value = false;
+  resumeTimer = setTimeout(() => {
+    startAutoCycle();
+  }, 8000);
+};
+
+// Convert active country coords to phi/theta targets
+watch(activeCountry, (newCountry) => {
+  if (isDragging.value) return;
+  // Cobe uses radians. Center Europe longitude nicely.
+  targetPhi.value = -newCountry.lng * Math.PI / 180;
+  targetTheta.value = newCountry.lat * Math.PI / 180;
+}, { immediate: true });
+
+// Globe instantiation
+const initGlobe = () => {
+  if (globe) {
+    globe.destroy();
+    globe = null;
+  }
+  
+  if (!globeCanvas.value) return;
+
+  globe = createGlobe(globeCanvas.value, {
+    devicePixelRatio: 2,
+    width: 800,
+    height: 800,
+    phi: currentPhi.value,
+    theta: currentTheta.value,
+    dark: 0,
+    diffuse: 1.15,
+    scale: 1.05,
+    mapSamples: 16000,
+    mapBrightness: 8.5,
+    baseColor: [1, 1, 1], // Pure white
+    markerColor: [0.0, 0.2, 0.6], // EU blue
+    glowColor: [0.93, 0.95, 1.0], // Soft blue glow
+    offset: [0, 0],
+    markers: [],
+    onRender: (state: any) => {
+      // Springy camera interpolation
+      currentPhi.value += (targetPhi.value - currentPhi.value) * 0.08;
+      currentTheta.value += (targetTheta.value - currentTheta.value) * 0.08;
+      state.phi = currentPhi.value;
+      state.theta = currentTheta.value;
+
+      // Update markers dynamically
+      state.markers = eurozoneCapitals.map(c => {
+        const isActive = c.code === activeCountryCode.value;
+        return {
+          location: [c.lat, c.lng] as [number, number],
+          size: isActive ? 0.075 : 0.035,
+          color: isActive ? [0.0, 0.4, 1.0] : [0.0, 0.2, 0.6]
+        };
+      });
+    }
+  });
+};
+
+const destroyGlobe = () => {
+  if (globe) {
+    globe.destroy();
+    globe = null;
+  }
+  stopAutoCycle();
+  if (resumeTimer) {
+    clearTimeout(resumeTimer);
+    resumeTimer = null;
+  }
+};
+
+// Lifecycle
+watch(currentPath, async (newPath) => {
+  if (newPath !== '/app') {
+    await nextTick();
+    initGlobe();
+    startAutoCycle();
+  } else {
+    destroyGlobe();
+  }
+}, { immediate: true });
+
 onMounted(() => {
   // Always load API data in the background to prime the cache and populate the marquee
   dataStore.fetchAllData();
@@ -56,6 +257,7 @@ onUnmounted(() => {
   window.removeEventListener('keydown', handleKeyDown);
   window.removeEventListener('scroll', handleScroll);
   window.removeEventListener('resize', handleResize);
+  destroyGlobe();
 });
 
 const screen1Style = computed(() => {
@@ -166,49 +368,72 @@ const marqueeItems = computed(() => {
       </svg>
     </div>
 
-    <!-- ASCII Background (Left-aligned, scaling responsively, straight and static) -->
-    <div class="absolute inset-y-0 left-0 flex items-center justify-start pointer-events-none select-none z-0 pl-6 sm:pl-12 md:pl-20">
-      <pre class="font-mono text-[3vw] md:text-[2.2vw] lg:text-[1.8vw] leading-none text-[#003399]/20 select-none pointer-events-none tracking-tighter">
-           €€€€€€€€€€€€€
-        €€€€€         €€€€€
-      €€€€
-     €€€€
-  €€€€€€€€€€€€€€€€€
-  €€€€€€€€€€€€€€€€€
-  €€€€
-  €€€€€€€€€€€€€€€€€
-  €€€€€€€€€€€€€€€€€
-  €€€€
-     €€€€
-      €€€€
-        €€€€€         €€€€€
-           €€€€€€€€€€€€€
-      </pre>
-    </div>
-
-    <!-- Empty Spacer to balance layout without header -->
-    <div class="h-10"></div>
-
-    <!-- Main Content -->
-    <main class="w-full max-w-4xl mx-auto px-6 flex-grow flex flex-col justify-center items-center text-center z-10 gap-6 my-auto">
-      <h1 class="font-serif italic text-7xl sm:text-8xl md:text-9xl tracking-tight leading-none text-[#003399] select-none">
-        EuroMetrics
-      </h1>
-      <p class="font-mono text-[10px] sm:text-xs tracking-wider uppercase text-[#003399]/80 max-w-md leading-relaxed select-none">
-        A real-time dashboard for Eurozone sovereign yields, macroeconomics, and central bank policy.
-      </p>
+    <!-- Main Content (Interactive Globe Column + App Pitch Column) -->
+    <main class="w-full max-w-6xl mx-auto px-6 flex-grow flex flex-col lg:flex-row items-center justify-center gap-8 lg:gap-16 z-10 my-auto py-8">
       
-      <!-- CTA -->
-      <div class="mt-8 flex flex-col items-center gap-3">
-        <button
-          @click="navigateTo('/app')"
-          class="px-8 py-3 bg-[#003399] text-white font-mono text-[10px] tracking-widest uppercase font-bold hover:bg-[#002280] active:scale-98 transition-all cursor-pointer border-0 shadow-none rounded-none"
-        >
-          ENTER DASHBOARD
-        </button>
-        <span class="font-mono text-[8px] text-[#003399]/40 select-none uppercase tracking-widest">
-          Press Enter or Click to Launch
-        </span>
+      <!-- Left: Interactive WebGL Globe -->
+      <div class="relative w-[280px] h-[280px] sm:w-[350px] sm:h-[350px] md:w-[420px] md:h-[420px] flex items-center justify-center shrink-0">
+        <!-- Canvas for Cobe WebGL Globe -->
+        <canvas 
+          ref="globeCanvas" 
+          @pointerdown="onPointerDown" 
+          @pointermove="onPointerMove" 
+          @pointerup="onPointerUp" 
+          @pointerout="onPointerUp"
+          class="w-full h-full cursor-grab active:cursor-grabbing opacity-90 transition-opacity duration-500" 
+          style="width: 100%; height: 100%;"
+        ></canvas>
+        
+        <!-- Symmetrical Floating Indicator Card -->
+        <div class="absolute bottom-2 left-1/2 -translate-x-1/2 bg-white/95 border border-[#003399]/20 px-4 py-2 text-center shadow-none select-none pointer-events-auto backdrop-blur-sm min-w-[170px] rounded-none">
+          <div class="font-mono text-[8px] text-[#003399]/60 tracking-wider uppercase">Active Sovereign</div>
+          <div class="font-sans font-bold text-sm text-[#003399] flex items-center justify-center gap-1.5 mt-0.5">
+            <span>{{ activeCountry.name }}</span>
+            <span class="text-[9px] font-mono text-[#003399]/50">({{ activeCountry.code }})</span>
+          </div>
+          <div class="font-mono text-xs font-bold text-[#003399] mt-1 border-t border-[#003399]/10 pt-1">
+            10Y YIELD: <span class="text-[#003399] font-bold">{{ currentCountryYield }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Main Branding & Call to Action -->
+      <div class="flex flex-col items-center lg:items-start text-center lg:text-left max-w-lg gap-6">
+        <h1 class="font-serif italic text-6xl sm:text-7xl md:text-8xl tracking-tight leading-none text-[#003399]">
+          EuroMetrics
+        </h1>
+        <p class="font-mono text-[10px] sm:text-xs tracking-wider uppercase text-[#003399]/80 leading-relaxed max-w-md">
+          A real-time dashboard for Eurozone sovereign yields, macroeconomics, and central bank policy.
+        </p>
+
+        <!-- Dynamic Country Selector Tabs -->
+        <div class="flex flex-col items-center lg:items-start gap-2 w-full mt-2">
+          <span class="font-mono text-[8px] text-[#003399]/50 uppercase tracking-widest pl-0.5">Focus Country Yield</span>
+          <div class="flex flex-wrap justify-center lg:justify-start gap-1 font-mono text-[9px]">
+            <button 
+              v-for="c in featuredCountries" 
+              :key="c.code"
+              @click="selectCountry(c)"
+              class="px-3 py-1 border transition-all cursor-pointer font-bold select-none rounded-none"
+              :class="[activeCountryCode === c.code ? 'bg-[#003399] text-white border-[#003399]' : 'border-[#003399]/20 text-[#003399]/70 hover:border-[#003399]/50 hover:text-[#003399] bg-[#003399]/2']"
+            >
+              {{ c.code }}
+            </button>
+          </div>
+        </div>
+        
+        <!-- CTA -->
+        <div class="mt-4 flex flex-col items-center lg:items-start gap-3 w-full">
+          <button
+            @click="navigateTo('/app')"
+            class="px-8 py-3 bg-[#003399] text-white font-mono text-[10px] tracking-widest uppercase font-bold hover:bg-[#002280] active:scale-98 transition-all cursor-pointer border-0 shadow-none rounded-none w-full sm:w-auto"
+          >
+            ENTER DASHBOARD
+          </button>
+          <span class="font-mono text-[8px] text-[#003399]/40 uppercase tracking-widest self-center lg:self-start pl-1">
+            Press Enter or Click to Launch
+          </span>
+        </div>
       </div>
     </main>
 
