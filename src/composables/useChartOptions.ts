@@ -120,7 +120,7 @@ export function useChartOptions(activeSeries: Ref<BondSeries[]>, isDark: Ref<boo
         top: 40,
         left: 50,
         right: 20,
-        bottom: 95, // Space for dataZoom and legend
+        bottom: 115, // Space for dataZoom, legend, and scroll indicator
         containLabel: false,
         borderColor: gridBorderColor,
         borderWidth: 1,
@@ -171,7 +171,7 @@ export function useChartOptions(activeSeries: Ref<BondSeries[]>, isDark: Ref<boo
       legend: {
         show: true,
         type: 'scroll', // Handles large list of selected countries
-        bottom: 5,
+        bottom: 25,
         icon: 'rect',
         itemWidth: 10,
         itemHeight: 10,
@@ -253,7 +253,7 @@ export function useChartOptions(activeSeries: Ref<BondSeries[]>, isDark: Ref<boo
           type: 'slider', // Horizontal slider underneath grid
           show: true,
           xAxisIndex: 0,
-          bottom: 35,
+          bottom: 55,
           height: 16,
           borderColor: gridBorderColor,
           fillerColor: dark ? 'rgba(245, 245, 245, 0.05)' : 'rgba(10, 10, 10, 0.05)',
