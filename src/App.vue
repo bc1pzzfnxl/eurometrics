@@ -67,7 +67,7 @@ const eurozoneCapitals = [
   { code: 'MT', lat: 35.8989, lng: 14.5146 }
 ];
 
-const currentPhi = ref(-0.44); // Rotated 20 degrees clockwise from Europe center
+const currentPhi = ref(-0.61); // Rotated 35 degrees clockwise from Europe center
 const currentTheta = ref(0.84); // Mathematically centered latitude for Europe cluster
 
 // Cobe Projected coordinates helper matching Cobe's GLSL rotation matrix
