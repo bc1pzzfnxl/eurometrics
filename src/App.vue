@@ -67,7 +67,7 @@ const eurozoneCapitals = [
   { code: 'MT', lat: 35.8989, lng: 14.5146 }
 ];
 
-const currentPhi = ref(-0.18); // Focused longitude to bring Europe front and center (10° E)
+const currentPhi = ref(-0.05); // Focused longitude to bring Europe slightly left of center
 const currentTheta = ref(0.85); // Focused tilt looking down on Europe (48° N)
 
 // Cobe Projected coordinates helper matching Cobe's GLSL rotation matrix
