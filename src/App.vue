@@ -342,7 +342,7 @@ const marqueeItems = computed(() => {
     <main class="w-full max-w-5xl mx-auto px-6 flex-grow flex flex-col md:flex-row items-center justify-center gap-8 md:gap-16 z-10 my-auto py-8">
       
       <!-- Left: Interactive WebGL Globe -->
-      <div class="relative w-[263px] h-[263px] sm:w-[338px] sm:h-[338px] md:w-[450px] md:h-[450px] flex items-center justify-center shrink-0">
+      <div class="relative w-[263px] h-[263px] sm:w-[338px] sm:h-[338px] md:w-[450px] md:h-[450px] flex items-center justify-center shrink-0 animate-float">
         <!-- Background Radial Glow (Soft EU Blue aura behind the light globe) -->
         <div class="absolute inset-0 rounded-full pointer-events-none" style="background: radial-gradient(circle, rgba(0, 51, 153, 0.04) 0%, transparent 70%);"></div>
         <!-- Canvas for Cobe WebGL Globe -->
