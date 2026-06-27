@@ -67,15 +67,8 @@ const eurozoneCapitals = [
   { code: 'MT', lat: 35.8989, lng: 14.5146 }
 ];
 
-const currentPhi = ref(0);
-const phi = ref(0);
-const currentTheta = ref(0);
-const theta = ref(0);
-
-const isDragging = ref(false);
-const dragStart = ref({ x: 0, y: 0 });
-const dragPhi = ref(0);
-const dragTheta = ref(0);
+const currentPhi = ref(-10 * Math.PI / 180);
+const currentTheta = ref(50 * Math.PI / 180);
 
 // Cobe Projected coordinates helper matching Cobe's GLSL rotation matrix
 const getMarker2D = (lat: number, lng: number) => {
@@ -134,46 +127,14 @@ const featuredBonds = computed(() => {
   });
 });
 
-let animationFrameId: number | null = null;
-
-const onPointerDown = (e: PointerEvent) => {
-  isDragging.value = true;
-  dragStart.value = { x: e.clientX, y: e.clientY };
-  dragPhi.value = phi.value;
-  dragTheta.value = theta.value;
-};
-
-const onPointerMove = (e: PointerEvent) => {
-  if (!isDragging.value) return;
-  const dx = e.clientX - dragStart.value.x;
-  const dy = e.clientY - dragStart.value.y;
-  phi.value = dragPhi.value - dx / 250;
-  theta.value = Math.max(-0.6, Math.min(1.2, dragTheta.value + dy / 250));
-};
-
-const onPointerUp = () => {
-  isDragging.value = false;
-};
-
 // Globe instantiation
 const initGlobe = () => {
   if (globe) {
     globe.destroy();
     globe = null;
   }
-  if (animationFrameId) {
-    cancelAnimationFrame(animationFrameId);
-    animationFrameId = null;
-  }
   
   if (!globeCanvas.value) return;
-
-  // Europe is centered at longitude ~10, latitude ~50
-  // Initial camera angles to make Europe face the screen on start
-  phi.value = -10 * Math.PI / 180;
-  currentPhi.value = -10 * Math.PI / 180;
-  theta.value = 0; // Rotate on the equator axis
-  currentTheta.value = 0;
 
   globe = createGlobe(globeCanvas.value, {
     devicePixelRatio: Math.min(window.devicePixelRatio || 1, 2),
@@ -198,35 +159,12 @@ const initGlobe = () => {
       };
     })
   });
-
-  const animate = () => {
-    if (!isDragging.value) {
-      phi.value += 0.003; // Smooth rotation
-      theta.value = 0; // Return/lock to equator tilt
-    }
-    currentPhi.value += (phi.value - currentPhi.value) * 0.08;
-    currentTheta.value += (theta.value - currentTheta.value) * 0.08;
-    
-    if (globe) {
-      globe.update({
-        phi: currentPhi.value,
-        theta: currentTheta.value
-      });
-    }
-    animationFrameId = requestAnimationFrame(animate);
-  };
-  
-  animate();
 };
 
 const destroyGlobe = () => {
   if (globe) {
     globe.destroy();
     globe = null;
-  }
-  if (animationFrameId) {
-    cancelAnimationFrame(animationFrameId);
-    animationFrameId = null;
   }
 };
 
@@ -378,11 +316,7 @@ const marqueeItems = computed(() => {
         <!-- Canvas for Cobe WebGL Globe -->
         <canvas 
           ref="globeCanvas" 
-          @pointerdown="onPointerDown" 
-          @pointermove="onPointerMove" 
-          @pointerup="onPointerUp" 
-          @pointerout="onPointerUp"
-          class="w-full h-full cursor-grab active:cursor-grabbing opacity-95" 
+          class="w-full h-full opacity-95" 
           style="width: 100%; height: 100%;"
         ></canvas>
 
