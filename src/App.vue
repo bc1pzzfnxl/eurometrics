@@ -415,13 +415,13 @@ const marqueeItems = computed(() => {
 
       <!-- Right: Main Branding & Call to Action -->
       <div class="flex flex-col items-center md:items-start text-center md:text-left max-w-md gap-6">
-        <h1 class="font-serif italic text-6xl sm:text-7xl md:text-8xl tracking-tight leading-none text-[#003399] animate-fade-in">
+        <h1 class="font-serif italic text-7xl sm:text-8xl md:text-9xl tracking-tight leading-none text-[#003399] animate-fade-in">
           EuroMetrics
         </h1>
-        <p class="font-mono text-[10px] sm:text-xs tracking-wider uppercase text-[#003399]/80 leading-relaxed animate-fade-in animation-delay-150">
+        <p class="font-mono text-xs sm:text-sm tracking-wider uppercase text-[#003399]/80 leading-relaxed animate-fade-in animation-delay-150">
           Track every ECB rate decision, bond yield, and macro shift — before the market reacts.
         </p>
-        <p class="font-mono text-[8px] sm:text-[10px] tracking-wider uppercase text-[#003399]/50 -mt-4 animate-fade-in animation-delay-150">
+        <p class="font-mono text-[10px] sm:text-xs tracking-wider uppercase text-[#003399]/50 -mt-4 animate-fade-in animation-delay-150">
           Live data · Zero delay · Direct from ECB &amp; Eurostat
         </p>
         
@@ -429,11 +429,11 @@ const marqueeItems = computed(() => {
         <div class="mt-2 flex flex-col items-center md:items-start gap-3 w-full animate-fade-in animation-delay-300">
           <button
             @click="navigateTo('/app')"
-            class="group px-8 py-3 bg-[#003399] text-white font-mono text-[10px] tracking-widest uppercase font-bold hover:bg-[#002280] hover:shadow-[0_0_20px_rgba(0,51,153,0.3)] active:scale-98 transition-all cursor-pointer border-0 shadow-none rounded-none w-full sm:w-auto"
+            class="group px-8 py-3 bg-[#003399] text-white font-mono text-xs tracking-widest uppercase font-bold hover:bg-[#002280] hover:shadow-[0_0_20px_rgba(0,51,153,0.3)] active:scale-98 transition-all cursor-pointer border-0 shadow-none rounded-none w-full sm:w-auto"
           >
             EXPLORE LIVE DATA <span class="inline-block transition-transform group-hover:translate-x-1">→</span>
           </button>
-          <span class="font-mono text-[8px] text-[#003399]/40 uppercase tracking-widest self-center md:self-start pl-1">
+          <span class="font-mono text-[10px] text-[#003399]/40 uppercase tracking-widest self-center md:self-start pl-1">
             Free · No signup · Updated daily
           </span>
         </div>
