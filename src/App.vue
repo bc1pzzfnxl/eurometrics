@@ -67,8 +67,8 @@ const eurozoneCapitals = [
   { code: 'MT', lat: 35.8989, lng: 14.5146 }
 ];
 
-const currentPhi = ref(0.15); // Focused longitude to bring Europe front and center
-const currentTheta = ref(0.4); // Focused Northern hemisphere tilt looking down on Europe
+const currentPhi = ref(0.0); // Align center to prime meridian (0°) to place Europe in the center horizontally
+const currentTheta = ref(0.2); // Tilt Northern hemisphere down (0.2 radians) as requested in the options
 
 // Cobe Projected coordinates helper matching Cobe's GLSL rotation matrix
 const getMarker2D = (lat: number, lng: number) => {
@@ -128,29 +128,35 @@ const featuredBonds = computed(() => {
   });
 });
 
+let animationFrameId: number | null = null;
+
 // Globe instantiation
 const initGlobe = () => {
   if (globe) {
     globe.destroy();
     globe = null;
   }
+  if (animationFrameId) {
+    cancelAnimationFrame(animationFrameId);
+    animationFrameId = null;
+  }
   
   if (!globeCanvas.value) return;
 
   globe = createGlobe(globeCanvas.value, {
     devicePixelRatio: Math.min(window.devicePixelRatio || 1, 2),
-    width: 1000,
-    height: 1000,
+    width: 600 * 2, // 1200 as requested
+    height: 600 * 2, // 1200 as requested
     phi: currentPhi.value,
     theta: currentTheta.value,
     dark: 0, // Light mode so ocean is white and land is dark!
-    diffuse: 1.5,
+    diffuse: 1.2, // diffuse 1.2 as requested
     scale: 1.15, // Enlarged scale to make the globe bigger and separate markers
-    mapSamples: 16000,
-    mapBrightness: 10,
-    baseColor: [1.0, 1.0, 1.0], // White ocean
-    markerColor: [0.0, 0.2, 0.6], // EU Blue markers
-    glowColor: [0.94, 0.93, 0.91], // Soft warm grey 3D edge shading (creates the globe sphere outline)
+    mapSamples: 16000, // mapSamples 16000 as requested
+    mapBrightness: 10, // Higher brightness to ensure dots are clearly visible against white base
+    baseColor: [1.0, 1.0, 1.0], // White ocean as requested
+    markerColor: [0.2, 0.4, 1.0], // Royal Blue markers matching the user's request
+    glowColor: [1.0, 1.0, 1.0], // White glow matching the user's request
     offset: [0, 0],
     markers: eurozoneCapitals.map(c => {
       const isFeatured = ['DE', 'FR', 'IT', 'ES', 'NL', 'BE'].includes(c.code);
@@ -160,12 +166,31 @@ const initGlobe = () => {
       };
     })
   });
+
+  // Keep a static requestAnimationFrame loop running.
+  // This resolves the bug in Cobe's compiled ESM build where texture image onload updates
+  // are not painted to the canvas unless a re-render is triggered on a frame cycle.
+  const animate = () => {
+    if (globe) {
+      globe.update({
+        phi: currentPhi.value,
+        theta: currentTheta.value
+      });
+    }
+    animationFrameId = requestAnimationFrame(animate);
+  };
+
+  animate();
 };
 
 const destroyGlobe = () => {
   if (globe) {
     globe.destroy();
     globe = null;
+  }
+  if (animationFrameId) {
+    cancelAnimationFrame(animationFrameId);
+    animationFrameId = null;
   }
 };
 
@@ -311,7 +336,7 @@ const marqueeItems = computed(() => {
     <main class="w-full max-w-5xl mx-auto px-6 flex-grow flex flex-col md:flex-row items-center justify-center gap-8 md:gap-16 z-10 my-auto py-8">
       
       <!-- Left: Interactive WebGL Globe -->
-      <div class="relative w-[350px] h-[350px] sm:w-[450px] sm:h-[450px] md:w-[540px] md:h-[540px] flex items-center justify-center shrink-0">
+      <div class="relative w-[350px] h-[350px] sm:w-[450px] sm:h-[450px] md:w-[600px] md:h-[600px] flex items-center justify-center shrink-0">
         <!-- Background Radial Glow (Soft EU Blue aura behind the light globe) -->
         <div class="absolute inset-0 rounded-full pointer-events-none" style="background: radial-gradient(circle, rgba(0, 51, 153, 0.04) 0%, transparent 70%);"></div>
         <!-- Canvas for Cobe WebGL Globe -->
