@@ -102,17 +102,17 @@ const getMarker2D = (lat: number, lng: number) => {
 // We include custom horizontal shifts (shiftX) and vertical heights (hVal) to stagger and prevent overlaps
 const featuredBonds = computed(() => {
   const list = [
-    { code: 'DE', name: 'Germany', city: 'Berlin', lat: 52.5200, lng: 13.4050, fallback: '2.40%', shiftX: '26px', hVal: '24px', desktopOnly: false },
+    { code: 'DE', name: 'Germany', city: 'Berlin', lat: 52.5200, lng: 13.4050, fallback: '2.40%', shiftX: '-20px', hVal: '32px', desktopOnly: false },
     { code: 'FR', name: 'France', city: 'Paris', lat: 48.8566, lng: 2.3522, fallback: '3.05%', shiftX: '-20px', hVal: '6px', desktopOnly: false },
     { code: 'IT', name: 'Italy', city: 'Rome', lat: 41.9028, lng: 12.4964, fallback: '3.85%', shiftX: '15px', hVal: '6px', desktopOnly: false },
     { code: 'ES', name: 'Spain', city: 'Madrid', lat: 40.4168, lng: -3.7038, fallback: '3.20%', shiftX: '24px', hVal: '6px', desktopOnly: false },
     { code: 'PT', name: 'Portugal', city: 'Lisbon', lat: 38.7223, lng: -9.1393, fallback: '3.15%', shiftX: '-24px', hVal: '6px', desktopOnly: true },
-    { code: 'IE', name: 'Ireland', city: 'Dublin', lat: 53.3498, lng: -6.2603, fallback: '2.80%', shiftX: null, hVal: '6px', desktopOnly: true },
-    { code: 'AT', name: 'Austria', city: 'Vienna', lat: 48.2082, lng: 16.3738, fallback: '2.75%', shiftX: '-38px', hVal: '6px', desktopOnly: true },
+    { code: 'IE', name: 'Ireland', city: 'Dublin', lat: 53.3498, lng: -6.2603, fallback: '2.80%', shiftX: '-20px', hVal: '6px', desktopOnly: true },
+    { code: 'AT', name: 'Austria', city: 'Vienna', lat: 48.2082, lng: 16.3738, fallback: '2.75%', shiftX: '24px', hVal: '20px', desktopOnly: true },
     { code: 'FI', name: 'Finland', city: 'Helsinki', lat: 60.1699, lng: 24.9384, fallback: '2.70%', shiftX: '-28px', hVal: '6px', desktopOnly: true },
-    { code: 'GR', name: 'Greece', city: 'Athens', lat: 37.9838, lng: 23.7275, fallback: '3.60%', shiftX: null, hVal: '6px', desktopOnly: true },
+    { code: 'GR', name: 'Greece', city: 'Athens', lat: 37.9838, lng: 23.7275, fallback: '3.60%', shiftX: '20px', hVal: '6px', desktopOnly: true },
     { code: 'LT', name: 'Lithuania', city: 'Vilnius', lat: 54.6872, lng: 25.2797, fallback: '3.15%', shiftX: '20px', hVal: '6px', desktopOnly: true },
-    { code: 'EE', name: 'Estonia', city: 'Tallinn', lat: 59.4370, lng: 24.7535, fallback: '3.10%', shiftX: '28px', hVal: '6px', desktopOnly: true }
+    { code: 'EE', name: 'Estonia', city: 'Tallinn', lat: 59.4370, lng: 24.7535, fallback: '3.10%', shiftX: '28px', hVal: '34px', desktopOnly: true }
   ];
 
   return list.map(c => {
