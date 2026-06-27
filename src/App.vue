@@ -102,17 +102,17 @@ const getMarker2D = (lat: number, lng: number) => {
 // We include custom horizontal shifts (shiftX) and vertical heights (hVal) to stagger and prevent overlaps
 const featuredBonds = computed(() => {
   const list = [
-    { code: 'DE', name: 'Germany', city: 'Berlin', lat: 52.5200, lng: 13.4050, fallback: '2.40%', shiftX: '-20px', hVal: '32px', desktopOnly: false },
-    { code: 'FR', name: 'France', city: 'Paris', lat: 48.8566, lng: 2.3522, fallback: '3.05%', shiftX: '-20px', hVal: '6px', desktopOnly: false },
-    { code: 'IT', name: 'Italy', city: 'Rome', lat: 41.9028, lng: 12.4964, fallback: '3.85%', shiftX: '15px', hVal: '6px', desktopOnly: false },
-    { code: 'ES', name: 'Spain', city: 'Madrid', lat: 40.4168, lng: -3.7038, fallback: '3.20%', shiftX: '24px', hVal: '6px', desktopOnly: false },
-    { code: 'PT', name: 'Portugal', city: 'Lisbon', lat: 38.7223, lng: -9.1393, fallback: '3.15%', shiftX: '-24px', hVal: '6px', desktopOnly: true },
-    { code: 'IE', name: 'Ireland', city: 'Dublin', lat: 53.3498, lng: -6.2603, fallback: '2.80%', shiftX: '-20px', hVal: '6px', desktopOnly: true },
-    { code: 'AT', name: 'Austria', city: 'Vienna', lat: 48.2082, lng: 16.3738, fallback: '2.75%', shiftX: '24px', hVal: '20px', desktopOnly: true },
-    { code: 'FI', name: 'Finland', city: 'Helsinki', lat: 60.1699, lng: 24.9384, fallback: '2.70%', shiftX: '-28px', hVal: '6px', desktopOnly: true },
-    { code: 'GR', name: 'Greece', city: 'Athens', lat: 37.9838, lng: 23.7275, fallback: '3.60%', shiftX: '20px', hVal: '6px', desktopOnly: true },
-    { code: 'LT', name: 'Lithuania', city: 'Vilnius', lat: 54.6872, lng: 25.2797, fallback: '3.15%', shiftX: '20px', hVal: '6px', desktopOnly: true },
-    { code: 'EE', name: 'Estonia', city: 'Tallinn', lat: 59.4370, lng: 24.7535, fallback: '3.10%', shiftX: '28px', hVal: '34px', desktopOnly: true }
+    { code: 'DE', name: 'Germany', city: 'Berlin', lat: 52.5200, lng: 13.4050, fallback: '2.40%', shiftX: '-20px', hVal: '32px', desktopOnly: false, placement: 'top' },
+    { code: 'FR', name: 'France', city: 'Paris', lat: 48.8566, lng: 2.3522, fallback: '3.05%', shiftX: '-20px', hVal: '6px', desktopOnly: false, placement: 'top' },
+    { code: 'IT', name: 'Italy', city: 'Rome', lat: 41.9028, lng: 12.4964, fallback: '3.85%', shiftX: '15px', hVal: '6px', desktopOnly: false, placement: 'bottom' },
+    { code: 'ES', name: 'Spain', city: 'Madrid', lat: 40.4168, lng: -3.7038, fallback: '3.20%', shiftX: '24px', hVal: '6px', desktopOnly: false, placement: 'top' },
+    { code: 'PT', name: 'Portugal', city: 'Lisbon', lat: 38.7223, lng: -9.1393, fallback: '3.15%', shiftX: '-24px', hVal: '6px', desktopOnly: true, placement: 'top' },
+    { code: 'IE', name: 'Ireland', city: 'Dublin', lat: 53.3498, lng: -6.2603, fallback: '2.80%', shiftX: '-20px', hVal: '6px', desktopOnly: true, placement: 'top' },
+    { code: 'AT', name: 'Austria', city: 'Vienna', lat: 48.2082, lng: 16.3738, fallback: '2.75%', shiftX: '24px', hVal: '20px', desktopOnly: true, placement: 'top' },
+    { code: 'FI', name: 'Finland', city: 'Helsinki', lat: 60.1699, lng: 24.9384, fallback: '2.70%', shiftX: '-28px', hVal: '6px', desktopOnly: true, placement: 'top' },
+    { code: 'GR', name: 'Greece', city: 'Athens', lat: 37.9838, lng: 23.7275, fallback: '3.60%', shiftX: '20px', hVal: '6px', desktopOnly: true, placement: 'bottom' },
+    { code: 'LT', name: 'Lithuania', city: 'Vilnius', lat: 54.6872, lng: 25.2797, fallback: '3.15%', shiftX: '20px', hVal: '6px', desktopOnly: true, placement: 'top' },
+    { code: 'EE', name: 'Estonia', city: 'Tallinn', lat: 59.4370, lng: 24.7535, fallback: '3.10%', shiftX: '28px', hVal: '34px', desktopOnly: true, placement: 'top' }
   ];
 
   return list.map(c => {
@@ -356,32 +356,56 @@ const marqueeItems = computed(() => {
         <div 
           v-for="bond in featuredBonds" 
           :key="bond.code"
-          class="absolute pointer-events-none select-none transition-opacity duration-150 flex flex-col items-center justify-end"
-          :class="[bond.desktopOnly ? 'hidden md:flex' : 'flex']"
+          class="absolute pointer-events-none select-none transition-opacity duration-150 flex flex-col items-center"
+          :class="[bond.desktopOnly ? 'hidden md:flex' : 'flex', bond.placement === 'bottom' ? 'justify-start' : 'justify-end']"
           :style="{
             left: bond.x + '%',
             top: bond.y + '%',
             opacity: bond.visible ? 1 : 0,
-            transform: 'translate(-50%, -100%)'
+            transform: bond.placement === 'bottom' ? 'translate(-50%, 0%)' : 'translate(-50%, -100%)'
           }"
         >
-          <!-- Tooltip box (shifted horizontally if needed) -->
-          <div 
-            class="bg-[#003399] text-white px-2 py-0.5 font-mono text-[8px] sm:text-[9px] font-bold tracking-wider whitespace-nowrap shadow-none rounded-none flex items-center gap-1.5 z-10"
-            :style="{
-              transform: bond.shiftX ? `translateX(${bond.shiftX})` : 'none'
-            }"
-          >
-            <span>{{ bond.code }}</span>
-            <span class="opacity-50">|</span>
-            <span>{{ bond.yield }}</span>
-          </div>
+          <!-- Bottom-oriented tooltip content -->
+          <template v-if="bond.placement === 'bottom'">
+            <!-- Staggered vertical connector line & arrow pin pointing up at the capital -->
+            <div class="flex flex-col items-center justify-start" :style="{ height: bond.hVal }">
+              <div class="w-0 h-0 border-l-[3px] border-l-transparent border-r-[3px] border-r-transparent border-b-[3px] border-b-[#003399]"></div>
+              <div v-if="bond.hVal !== '6px'" class="w-[1.5px] bg-[#003399]/70 flex-grow"></div>
+            </div>
 
-          <!-- Staggered vertical connector line & arrow pin pointing at the capital -->
-          <div class="flex flex-col items-center" :style="{ height: bond.hVal }">
-            <div v-if="bond.hVal !== '6px'" class="w-[1.5px] bg-[#003399]/70 flex-grow"></div>
-            <div class="w-0 h-0 border-l-[3px] border-l-transparent border-r-[3px] border-r-transparent border-t-[3px] border-t-[#003399]"></div>
-          </div>
+            <!-- Tooltip box (shifted horizontally if needed) -->
+            <div 
+              class="bg-[#003399] text-white px-2 py-0.5 font-mono text-[8px] sm:text-[9px] font-bold tracking-wider whitespace-nowrap shadow-none rounded-none flex items-center gap-1.5 z-10"
+              :style="{
+                transform: bond.shiftX ? `translateX(${bond.shiftX})` : 'none'
+              }"
+            >
+              <span>{{ bond.code }}</span>
+              <span class="opacity-50">|</span>
+              <span>{{ bond.yield }}</span>
+            </div>
+          </template>
+
+          <!-- Top-oriented tooltip content (default) -->
+          <template v-else>
+            <!-- Tooltip box (shifted horizontally if needed) -->
+            <div 
+              class="bg-[#003399] text-white px-2 py-0.5 font-mono text-[8px] sm:text-[9px] font-bold tracking-wider whitespace-nowrap shadow-none rounded-none flex items-center gap-1.5 z-10"
+              :style="{
+                transform: bond.shiftX ? `translateX(${bond.shiftX})` : 'none'
+              }"
+            >
+              <span>{{ bond.code }}</span>
+              <span class="opacity-50">|</span>
+              <span>{{ bond.yield }}</span>
+            </div>
+
+            <!-- Staggered vertical connector line & arrow pin pointing down at the capital -->
+            <div class="flex flex-col items-center justify-end" :style="{ height: bond.hVal }">
+              <div v-if="bond.hVal !== '6px'" class="w-[1.5px] bg-[#003399]/70 flex-grow"></div>
+              <div class="w-0 h-0 border-l-[3px] border-l-transparent border-r-[3px] border-r-transparent border-t-[3px] border-t-[#003399]"></div>
+            </div>
+          </template>
         </div>
       </div>
 
