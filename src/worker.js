@@ -82,7 +82,12 @@ export default {
 
     // 3. Serve static assets for all other routes
     try {
-      return await env.ASSETS.fetch(request);
+      const response = await env.ASSETS.fetch(request);
+      // Clone response and append no-transform to prevent Cloudflare Auto Minify from corrupting binary base64 in scripts
+      const newResponse = new Response(response.body, response);
+      const cc = response.headers.get('Cache-Control') || '';
+      newResponse.headers.set('Cache-Control', cc ? `${cc}, no-transform` : 'no-transform');
+      return newResponse;
     } catch (error) {
       console.error(JSON.stringify({
         message: 'Failed to serve static asset',
