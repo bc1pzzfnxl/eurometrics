@@ -136,7 +136,7 @@ onMounted(() => {
         <div class="flex flex-col gap-1.5 sm:block font-mono text-xs">
           <label class="sm:hidden text-[10px] text-text-muted font-bold block mb-0.5">CATEGORY</label>
           <Select v-model="filtersStore.rateCategory">
-            <SelectTrigger class="w-[170px] border-border font-mono text-xs text-foreground cursor-pointer rounded-none">
+            <SelectTrigger class="w-[220px] border-border font-mono text-xs text-foreground cursor-pointer rounded-none">
               <SelectValue placeholder="Category" />
             </SelectTrigger>
             <SelectContent class="border-border bg-background rounded-none">

@@ -139,14 +139,14 @@ const isSelected = (code: string) => {
           id="country-selector-trigger"
           variant="outline"
           :disabled="isCountrySelectorDisabled"
-          class="w-[200px] justify-between border-border font-mono text-xs text-foreground cursor-pointer rounded-none"
+          class="w-[260px] justify-between border-border font-mono text-xs text-foreground cursor-pointer rounded-none"
         >
           <span class="truncate">{{ triggerText }}</span>
           <span class="ml-2 text-text-muted">▼</span>
         </Button>
       </PopoverTrigger>
       
-      <PopoverContent class="w-[220px] p-0 border-border bg-background rounded-none" align="start">
+      <PopoverContent class="w-[320px] p-0 border-border bg-background rounded-none" align="start">
         <Command class="font-mono text-xs">
           <CommandInput :placeholder="filtersStore.rateCategory === 'policy_rate' ? 'Search rates...' : filtersStore.rateCategory === 'exchange_rate' ? 'Search currencies...' : 'Search countries...'" class="font-mono text-xs" />
           <CommandList class="max-h-[300px] overflow-y-auto">
@@ -167,7 +167,7 @@ const isSelected = (code: string) => {
                   <span v-if="isSelected(opt.code)" class="text-[9px] font-bold leading-none">✓</span>
                 </div>
                 <span class="font-bold w-[60px] text-left shrink-0">{{ opt.code }}</span>
-                <span class="truncate text-text-muted text-[11px]">{{ opt.name }}</span>
+                <span class="text-text-muted text-[11px]">{{ opt.name }}</span>
               </CommandItem>
             </CommandGroup>
           </CommandList>
