@@ -67,8 +67,8 @@ const eurozoneCapitals = [
   { code: 'MT', lat: 35.8989, lng: 14.5146 }
 ];
 
-const currentPhi = ref(-0.65); // Focused longitude to bring Europe even further right of center
-const currentTheta = ref(0.85); // Focused tilt looking down on Europe (48° N)
+const currentPhi = ref(-0.10); // Mathematically centered longitude for Europe cluster
+const currentTheta = ref(0.84); // Mathematically centered latitude for Europe cluster
 
 // Cobe Projected coordinates helper matching Cobe's GLSL rotation matrix
 const getMarker2D = (lat: number, lng: number) => {
@@ -158,13 +158,14 @@ const initGlobe = () => {
     markerColor: [0.2, 0.4, 1.0], // Royal Blue markers matching the user's request
     glowColor: [1.0, 1.0, 1.0], // White glow matching the user's request
     offset: [0, 0],
-    markers: eurozoneCapitals.map(c => {
-      const isFeatured = ['DE', 'FR', 'IT', 'ES', 'NL', 'BE'].includes(c.code);
-      return {
-        location: [c.lat, c.lng] as [number, number],
-        size: isFeatured ? 0.055 : 0.03
-      };
-    })
+    markers: eurozoneCapitals
+      .filter(c => ['DE', 'FR', 'IT', 'ES', 'NL', 'BE'].includes(c.code))
+      .map(c => {
+        return {
+          location: [c.lat, c.lng] as [number, number],
+          size: 0.055
+        };
+      })
   });
 
   // Keep a static requestAnimationFrame loop running.
