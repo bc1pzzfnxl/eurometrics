@@ -64,10 +64,21 @@ export function useChartOptions(activeSeries: Ref<BondSeries[]>, isDark: Ref<boo
       const dataMap = new Map<string, number>();
       s.points.forEach((p: DataPoint) => dataMap.set(p.date, p.value));
 
+      let lastVal: number | null = null;
+      const isStepCategory = ['policy_rate', 'mortgage', 'corporate', 'deposit', 'inflation', 'unemployment', 'gdp', 'debt_gdp'].includes(filtersStore.rateCategory);
+
       // Map values matching the global timeline to align all lines properly
+      // Forward-fill (carry forward last known observation) for step categories so tooltip works on all intermediate dates
       const seriesData = sortedDates.map(date => {
         const val = dataMap.get(date);
-        return val !== undefined ? val : null;
+        if (val !== undefined && val !== null) {
+          lastVal = val;
+          return val;
+        }
+        if (isStepCategory && lastVal !== null) {
+          return lastVal;
+        }
+        return null;
       });
 
       const color = countryColorMap.get(s.countryCode) || '#718096';
@@ -75,6 +86,7 @@ export function useChartOptions(activeSeries: Ref<BondSeries[]>, isDark: Ref<boo
       return {
         name: getCountryName(s.countryCode),
         type: 'line',
+        step: isStepCategory ? 'end' : undefined,
         data: seriesData,
         showSymbol: false,
         symbol: 'circle',
