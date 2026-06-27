@@ -68,28 +68,30 @@ const eurozoneCapitals = [
 ];
 
 const currentPhi = ref(0);
-const targetPhi = ref(0);
-const currentTheta = ref(0.4);
-const targetTheta = ref(0.4);
+const phi = ref(0);
+const currentTheta = ref(0.2);
+const theta = ref(0.2);
 
 const isDragging = ref(false);
 const dragStart = ref({ x: 0, y: 0 });
 const dragPhi = ref(0);
 const dragTheta = ref(0);
 
+let animationFrameId: number | null = null;
+
 const onPointerDown = (e: PointerEvent) => {
   isDragging.value = true;
   dragStart.value = { x: e.clientX, y: e.clientY };
-  dragPhi.value = currentPhi.value;
-  dragTheta.value = currentTheta.value;
+  dragPhi.value = phi.value;
+  dragTheta.value = theta.value;
 };
 
 const onPointerMove = (e: PointerEvent) => {
   if (!isDragging.value) return;
   const dx = e.clientX - dragStart.value.x;
   const dy = e.clientY - dragStart.value.y;
-  targetPhi.value = dragPhi.value - dx / 250;
-  targetTheta.value = Math.max(-0.6, Math.min(1.2, dragTheta.value + dy / 250));
+  phi.value = dragPhi.value - dx / 250;
+  theta.value = Math.max(-0.6, Math.min(1.2, dragTheta.value + dy / 250));
 };
 
 const onPointerUp = () => {
@@ -102,51 +104,68 @@ const initGlobe = () => {
     globe.destroy();
     globe = null;
   }
+  if (animationFrameId) {
+    cancelAnimationFrame(animationFrameId);
+    animationFrameId = null;
+  }
   
   if (!globeCanvas.value) return;
 
   // Europe is centered at longitude ~10, latitude ~50
   // Initial camera angles to make Europe face the screen on start
+  phi.value = -10 * Math.PI / 180;
   currentPhi.value = -10 * Math.PI / 180;
-  targetPhi.value = -10 * Math.PI / 180;
+  theta.value = 50 * Math.PI / 180;
   currentTheta.value = 50 * Math.PI / 180;
-  targetTheta.value = 50 * Math.PI / 180;
 
   globe = createGlobe(globeCanvas.value, {
-    devicePixelRatio: 2,
+    devicePixelRatio: Math.min(window.devicePixelRatio || 1, 2),
     width: 800,
     height: 800,
     phi: currentPhi.value,
     theta: currentTheta.value,
-    dark: 1, // Dark mode so ocean is dark blue and landmasses glow!
-    diffuse: 1.2,
+    dark: 0, // Light mode so ocean is white and land is dark!
+    diffuse: 1.5,
     scale: 1.0,
     mapSamples: 16000,
-    mapBrightness: 6,
-    baseColor: [0.03, 0.05, 0.15], // Deep EU navy blue ocean
-    markerColor: [1.0, 0.8, 0.0], // EU gold markers for capitals
-    glowColor: [0.05, 0.15, 0.35], // Soft blue glow
+    mapBrightness: 10,
+    baseColor: [1.0, 1.0, 1.0], // White ocean
+    markerColor: [0.0, 0.2, 0.6], // EU Blue markers
+    glowColor: [0.94, 0.93, 0.91], // Soft warm grey 3D edge shading (creates the globe sphere outline)
     offset: [0, 0],
     markers: eurozoneCapitals.map(c => ({
       location: [c.lat, c.lng] as [number, number],
       size: 0.045
-    })),
-    onRender: (state: any) => {
-      if (!isDragging.value) {
-        targetPhi.value += 0.004; // Smooth continuous rotation
-      }
-      currentPhi.value += (targetPhi.value - currentPhi.value) * 0.08;
-      currentTheta.value += (targetTheta.value - currentTheta.value) * 0.08;
-      state.phi = currentPhi.value;
-      state.theta = currentTheta.value;
-    }
+    }))
   });
+
+  const animate = () => {
+    if (!isDragging.value) {
+      phi.value += 0.003; // Smooth rotation
+    }
+    currentPhi.value += (phi.value - currentPhi.value) * 0.08;
+    currentTheta.value += (theta.value - currentTheta.value) * 0.08;
+    
+    if (globe) {
+      globe.update({
+        phi: currentPhi.value,
+        theta: currentTheta.value
+      });
+    }
+    animationFrameId = requestAnimationFrame(animate);
+  };
+  
+  animate();
 };
 
 const destroyGlobe = () => {
   if (globe) {
     globe.destroy();
     globe = null;
+  }
+  if (animationFrameId) {
+    cancelAnimationFrame(animationFrameId);
+    animationFrameId = null;
   }
 };
 
@@ -293,6 +312,8 @@ const marqueeItems = computed(() => {
       
       <!-- Left: Interactive WebGL Globe -->
       <div class="relative w-[280px] h-[280px] sm:w-[350px] sm:h-[350px] md:w-[400px] md:h-[400px] flex items-center justify-center shrink-0">
+        <!-- Background Radial Glow (Soft EU Blue aura behind the light globe) -->
+        <div class="absolute inset-0 rounded-full pointer-events-none" style="background: radial-gradient(circle, rgba(0, 51, 153, 0.04) 0%, transparent 70%);"></div>
         <!-- Canvas for Cobe WebGL Globe -->
         <canvas 
           ref="globeCanvas" 
