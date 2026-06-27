@@ -107,10 +107,10 @@ const featuredBonds = computed(() => {
     { code: 'IT', name: 'Italy', city: 'Rome', lat: 41.9028, lng: 12.4964, fallback: '3.85%', shiftX: '15px', hVal: '6px', desktopOnly: false, placement: 'bottom' },
     { code: 'ES', name: 'Spain', city: 'Madrid', lat: 40.4168, lng: -3.7038, fallback: '3.20%', shiftX: '-30px', hVal: '6px', desktopOnly: false, placement: 'top' },
     { code: 'PT', name: 'Portugal', city: 'Lisbon', lat: 38.7223, lng: -9.1393, fallback: '3.15%', shiftX: '-20px', hVal: '6px', desktopOnly: true, placement: 'bottom' },
-    { code: 'IE', name: 'Ireland', city: 'Dublin', lat: 53.3498, lng: -6.2603, fallback: '2.80%', shiftX: '-70px', hVal: '6px', desktopOnly: true, placement: 'top' },
-    { code: 'AT', name: 'Austria', city: 'Vienna', lat: 48.2082, lng: 16.3738, fallback: '2.75%', shiftX: '30px', hVal: '20px', desktopOnly: true, placement: 'top' },
+    { code: 'IE', name: 'Ireland', city: 'Dublin', lat: 53.3498, lng: -6.2603, fallback: '2.80%', shiftX: '-80px', hVal: '6px', desktopOnly: true, placement: 'top' },
+    { code: 'AT', name: 'Austria', city: 'Vienna', lat: 48.2082, lng: 16.3738, fallback: '2.75%', shiftX: '50px', hVal: '6px', desktopOnly: true, placement: 'bottom' },
     { code: 'FI', name: 'Finland', city: 'Helsinki', lat: 60.1699, lng: 24.9384, fallback: '2.70%', shiftX: '-45px', hVal: '24px', desktopOnly: true, placement: 'top' },
-    { code: 'GR', name: 'Greece', city: 'Athens', lat: 37.9838, lng: 23.7275, fallback: '3.60%', shiftX: '60px', hVal: '6px', desktopOnly: true, placement: 'bottom' },
+    { code: 'GR', name: 'Greece', city: 'Athens', lat: 37.9838, lng: 23.7275, fallback: '3.60%', shiftX: '70px', hVal: '6px', desktopOnly: true, placement: 'bottom' },
     { code: 'LT', name: 'Lithuania', city: 'Vilnius', lat: 54.6872, lng: 25.2797, fallback: '3.15%', shiftX: '45px', hVal: '6px', desktopOnly: true, placement: 'top' },
     { code: 'EE', name: 'Estonia', city: 'Tallinn', lat: 59.4370, lng: 24.7535, fallback: '3.10%', shiftX: '28px', hVal: '50px', desktopOnly: true, placement: 'top' }
   ];
@@ -150,8 +150,8 @@ const initGlobe = () => {
 
   globe = createGlobe(globeCanvas.value, {
     devicePixelRatio: Math.min(window.devicePixelRatio || 1, 2),
-    width: 600 * 2, // 1200 as requested
-    height: 600 * 2, // 1200 as requested
+    width: 450 * 2, // 900 (reduced 25%)
+    height: 450 * 2, // 900 (reduced 25%)
     phi: currentPhi.value,
     theta: currentTheta.value,
     dark: 0, // Light mode so ocean is white and land is dark!
@@ -342,7 +342,7 @@ const marqueeItems = computed(() => {
     <main class="w-full max-w-5xl mx-auto px-6 flex-grow flex flex-col md:flex-row items-center justify-center gap-8 md:gap-16 z-10 my-auto py-8">
       
       <!-- Left: Interactive WebGL Globe -->
-      <div class="relative w-[350px] h-[350px] sm:w-[450px] sm:h-[450px] md:w-[600px] md:h-[600px] flex items-center justify-center shrink-0">
+      <div class="relative w-[263px] h-[263px] sm:w-[338px] sm:h-[338px] md:w-[450px] md:h-[450px] flex items-center justify-center shrink-0">
         <!-- Background Radial Glow (Soft EU Blue aura behind the light globe) -->
         <div class="absolute inset-0 rounded-full pointer-events-none" style="background: radial-gradient(circle, rgba(0, 51, 153, 0.04) 0%, transparent 70%);"></div>
         <!-- Canvas for Cobe WebGL Globe -->
