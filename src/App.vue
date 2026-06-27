@@ -69,8 +69,8 @@ const eurozoneCapitals = [
 
 const currentPhi = ref(0);
 const phi = ref(0);
-const currentTheta = ref(0.2);
-const theta = ref(0.2);
+const currentTheta = ref(0);
+const theta = ref(0);
 
 const isDragging = ref(false);
 const dragStart = ref({ x: 0, y: 0 });
@@ -172,18 +172,18 @@ const initGlobe = () => {
   // Initial camera angles to make Europe face the screen on start
   phi.value = -10 * Math.PI / 180;
   currentPhi.value = -10 * Math.PI / 180;
-  theta.value = 50 * Math.PI / 180;
-  currentTheta.value = 50 * Math.PI / 180;
+  theta.value = 0; // Rotate on the equator axis
+  currentTheta.value = 0;
 
   globe = createGlobe(globeCanvas.value, {
     devicePixelRatio: Math.min(window.devicePixelRatio || 1, 2),
-    width: 800,
-    height: 800,
+    width: 1000,
+    height: 1000,
     phi: currentPhi.value,
     theta: currentTheta.value,
     dark: 0, // Light mode so ocean is white and land is dark!
     diffuse: 1.5,
-    scale: 1.0,
+    scale: 1.05, // Enlarged scale to separate country cards
     mapSamples: 16000,
     mapBrightness: 10,
     baseColor: [1.0, 1.0, 1.0], // White ocean
@@ -202,6 +202,7 @@ const initGlobe = () => {
   const animate = () => {
     if (!isDragging.value) {
       phi.value += 0.003; // Smooth rotation
+      theta.value = 0; // Return/lock to equator tilt
     }
     currentPhi.value += (phi.value - currentPhi.value) * 0.08;
     currentTheta.value += (theta.value - currentTheta.value) * 0.08;
@@ -371,7 +372,7 @@ const marqueeItems = computed(() => {
     <main class="w-full max-w-5xl mx-auto px-6 flex-grow flex flex-col md:flex-row items-center justify-center gap-8 md:gap-16 z-10 my-auto py-8">
       
       <!-- Left: Interactive WebGL Globe -->
-      <div class="relative w-[280px] h-[280px] sm:w-[350px] sm:h-[350px] md:w-[400px] md:h-[400px] flex items-center justify-center shrink-0">
+      <div class="relative w-[340px] h-[340px] sm:w-[420px] sm:h-[420px] md:w-[500px] md:h-[500px] flex items-center justify-center shrink-0">
         <!-- Background Radial Glow (Soft EU Blue aura behind the light globe) -->
         <div class="absolute inset-0 rounded-full pointer-events-none" style="background: radial-gradient(circle, rgba(0, 51, 153, 0.04) 0%, transparent 70%);"></div>
         <!-- Canvas for Cobe WebGL Globe -->
@@ -398,7 +399,7 @@ const marqueeItems = computed(() => {
           }"
         >
           <div class="bg-[#003399] text-white px-2 py-0.5 font-mono text-[8px] sm:text-[9px] font-bold tracking-wider whitespace-nowrap shadow-none rounded-none flex items-center gap-1.5">
-            <span>{{ bond.city.toUpperCase() }}</span>
+            <span>{{ bond.name.toUpperCase() }}</span>
             <span class="opacity-50">|</span>
             <span>{{ bond.yield }}</span>
           </div>
