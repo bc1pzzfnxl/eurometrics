@@ -482,7 +482,7 @@ const marqueeItems = computed(() => {
   <div v-else class="relative bg-background text-foreground min-h-screen">
     <!-- Screen 1: Sticky Main Dashboard (Header + Controls + Chart) -->
     <div
-      class="sticky top-0 h-[100dvh] w-full flex flex-col justify-between max-w-6xl mx-auto border-x border-border z-0 overflow-hidden will-change-[transform,filter,opacity]"
+      class="sticky top-0 h-[100dvh] w-full flex flex-col justify-between mx-auto border-x border-border z-0 overflow-hidden will-change-[transform,filter,opacity]"
       :style="screen1Style"
     >
       <!-- Header -->
@@ -540,7 +540,7 @@ const marqueeItems = computed(() => {
 
     <!-- Screen 2: Slide-over info page (Explanatory Text) -->
     <div class="relative z-10 w-full bg-background border-t border-border shadow-[0_-15px_30px_rgba(0,0,0,0.08)] dark:shadow-[0_-15px_30px_rgba(0,0,0,0.25)]">
-      <div class="max-w-6xl mx-auto border-x border-border p-6 md:p-12 lg:p-16 flex flex-col gap-8 font-mono select-none">
+      <div class="mx-auto border-x border-border p-6 md:p-12 lg:p-16 flex flex-col gap-8 font-mono select-none">
         
         <!-- Info Cards -->
         <div class="flex flex-col gap-6 leading-relaxed">
