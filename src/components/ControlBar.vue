@@ -168,9 +168,6 @@ onMounted(() => {
                   <SelectItem value="gdp" class="hover:bg-surface cursor-pointer select-none rounded-none font-mono text-xs">
                     GDP Growth %
                   </SelectItem>
-                  <SelectItem value="debt_gdp" class="hover:bg-surface cursor-pointer select-none rounded-none font-mono text-xs">
-                    Debt to GDP %
-                  </SelectItem>
                 </template>
 
                 <!-- Monetary Tab Categories -->
@@ -180,6 +177,29 @@ onMounted(() => {
                   </SelectItem>
                   <SelectItem value="exchange_rate" class="hover:bg-surface cursor-pointer select-none rounded-none font-mono text-xs">
                     EUR Exchange Rates
+                  </SelectItem>
+                </template>
+
+                <!-- Financial Stability Tab Categories -->
+                <template v-else-if="filtersStore.activeTab === 'stability'">
+                  <SelectItem value="deficit" class="hover:bg-surface cursor-pointer select-none rounded-none font-mono text-xs">
+                    Government Deficit %
+                  </SelectItem>
+                  <SelectItem value="debt_gdp" class="hover:bg-surface cursor-pointer select-none rounded-none font-mono text-xs">
+                    Government Debt %
+                  </SelectItem>
+                </template>
+
+                <!-- Activity & Consumption Tab Categories -->
+                <template v-else-if="filtersStore.activeTab === 'activity'">
+                  <SelectItem value="retail_sales" class="hover:bg-surface cursor-pointer select-none rounded-none font-mono text-xs">
+                    Retail Sales Growth
+                  </SelectItem>
+                  <SelectItem value="consumer_conf" class="hover:bg-surface cursor-pointer select-none rounded-none font-mono text-xs">
+                    Consumer Confidence
+                  </SelectItem>
+                  <SelectItem value="saving_rate" class="hover:bg-surface cursor-pointer select-none rounded-none font-mono text-xs">
+                    Household Saving Rate
                   </SelectItem>
                 </template>
               </SelectGroup>

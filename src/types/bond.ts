@@ -1,6 +1,6 @@
 export type Maturity = '3M' | '6M' | '1Y' | '2Y' | '5Y' | '10Y' | '30Y';
 
-export type ActiveTab = 'rates' | 'macro' | 'monetary';
+export type ActiveTab = 'rates' | 'macro' | 'monetary' | 'stability' | 'activity';
 
 export type RateCategory = 
   | 'sovereign' 
@@ -12,7 +12,11 @@ export type RateCategory =
   | 'unemployment'
   | 'gdp'
   | 'policy_rate'
-  | 'exchange_rate';
+  | 'exchange_rate'
+  | 'deficit'
+  | 'consumer_conf'
+  | 'retail_sales'
+  | 'saving_rate';
 
 export type BondType = 'sovereign' | 'short_term' | 'long_term';
 

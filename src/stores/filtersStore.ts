@@ -22,6 +22,10 @@ export const useFiltersStore = defineStore('filters', () => {
       rateCategory.value = 'inflation';
     } else if (newTab === 'monetary') {
       rateCategory.value = 'policy_rate';
+    } else if (newTab === 'stability') {
+      rateCategory.value = 'deficit';
+    } else if (newTab === 'activity') {
+      rateCategory.value = 'retail_sales';
     }
   });
 

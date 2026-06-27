@@ -549,3 +549,87 @@ function parseEcbExchangeRates(response: EcbSdmxResponse): Record<string, DataPo
 
   return parsedData;
 }
+
+/**
+ * Fetches quarterly government deficit/surplus (% of GDP) from Eurostat.
+ */
+export async function fetchDeficit(): Promise<Record<string, DataPoint[]>> {
+  const eurostatCountries = EUROZONE_COUNTRIES.map(c => c === 'GR' ? 'EL' : c);
+  const queryCountries = [...eurostatCountries, 'EA20', 'EA21', 'EA'];
+  const geoQuery = queryCountries.map(c => `geo=${c}`).join('&');
+  const url = `${EUROSTAT_BASE_URL}/gov_10q_ggnfa?format=JSON&lang=EN&${geoQuery}&na_item=B9&sector=S13&unit=PC_GDP`;
+  try {
+    console.log('Fetching government deficit/surplus from Eurostat...');
+    const response = await ofetch<EurostatResponse>(url, {
+      retry: 2,
+      retryDelay: 1000,
+    });
+    return parseEurostatDataset(response);
+  } catch (error) {
+    console.error('Failed to fetch government deficit:', error);
+    throw error;
+  }
+}
+
+/**
+ * Fetches monthly consumer confidence indicator (balance) from Eurostat.
+ */
+export async function fetchConsumerConfidence(): Promise<Record<string, DataPoint[]>> {
+  const eurostatCountries = EUROZONE_COUNTRIES.map(c => c === 'GR' ? 'EL' : c);
+  const queryCountries = [...eurostatCountries, 'EA20', 'EA21', 'EA'];
+  const geoQuery = queryCountries.map(c => `geo=${c}`).join('&');
+  const url = `${EUROSTAT_BASE_URL}/ei_bsco_m?format=JSON&lang=EN&${geoQuery}&indic=BS-CSMCI&s_adj=SA&unit=BAL`;
+  try {
+    console.log('Fetching consumer confidence from Eurostat...');
+    const response = await ofetch<EurostatResponse>(url, {
+      retry: 2,
+      retryDelay: 1000,
+    });
+    return parseEurostatDataset(response);
+  } catch (error) {
+    console.error('Failed to fetch consumer confidence:', error);
+    throw error;
+  }
+}
+
+/**
+ * Fetches monthly retail sales volume index (% change YoY) from Eurostat.
+ */
+export async function fetchRetailSales(): Promise<Record<string, DataPoint[]>> {
+  const eurostatCountries = EUROZONE_COUNTRIES.map(c => c === 'GR' ? 'EL' : c);
+  const queryCountries = [...eurostatCountries, 'EA20', 'EA21', 'EA'];
+  const geoQuery = queryCountries.map(c => `geo=${c}`).join('&');
+  const url = `${EUROSTAT_BASE_URL}/sts_trtu_m?format=JSON&lang=EN&${geoQuery}&unit=PCH_SM&s_adj=CA&indic_bt=VOL_SLS&nace_r2=G47`;
+  try {
+    console.log('Fetching retail sales growth from Eurostat...');
+    const response = await ofetch<EurostatResponse>(url, {
+      retry: 2,
+      retryDelay: 1000,
+    });
+    return parseEurostatDataset(response);
+  } catch (error) {
+    console.error('Failed to fetch retail sales:', error);
+    throw error;
+  }
+}
+
+/**
+ * Fetches quarterly household saving rate (%) from Eurostat.
+ */
+export async function fetchSavingRate(): Promise<Record<string, DataPoint[]>> {
+  const eurostatCountries = EUROZONE_COUNTRIES.map(c => c === 'GR' ? 'EL' : c);
+  const queryCountries = [...eurostatCountries, 'EA20', 'EA21', 'EA'];
+  const geoQuery = queryCountries.map(c => `geo=${c}`).join('&');
+  const url = `${EUROSTAT_BASE_URL}/nasq_10_ki?format=JSON&lang=EN&${geoQuery}&na_item=SRG_S14_S15&sector=S14_S15&unit=PC&s_adj=SCA`;
+  try {
+    console.log('Fetching household saving rates from Eurostat...');
+    const response = await ofetch<EurostatResponse>(url, {
+      retry: 2,
+      retryDelay: 1000,
+    });
+    return parseEurostatDataset(response);
+  } catch (error) {
+    console.error('Failed to fetch household saving rate:', error);
+    throw error;
+  }
+}

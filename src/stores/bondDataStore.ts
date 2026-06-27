@@ -10,10 +10,14 @@ import {
   fetchUnemployment,
   fetchGdpGrowth,
   fetchPolicyRates,
-  fetchExchangeRates
+  fetchExchangeRates,
+  fetchDeficit,
+  fetchConsumerConfidence,
+  fetchRetailSales,
+  fetchSavingRate
 } from '../services/ecbApi';
 
-const CACHE_KEY = 'eu_bonds_data_cache_v6';
+const CACHE_KEY = 'eu_bonds_data_cache_v7';
 const CACHE_DURATION_MS = 60 * 60 * 1000; // 1 hour cache
 
 interface CacheData {
@@ -29,6 +33,10 @@ interface CacheData {
   gdpGrowth: Record<string, DataPoint[]> | null;
   policyRates: Record<string, DataPoint[]> | null;
   exchangeRates: Record<string, DataPoint[]> | null;
+  deficit: Record<string, DataPoint[]> | null;
+  consumerConf: Record<string, DataPoint[]> | null;
+  retailSales: Record<string, DataPoint[]> | null;
+  savingRate: Record<string, DataPoint[]> | null;
   timestamp: number;
 }
 
@@ -45,6 +53,11 @@ export const useBondDataStore = defineStore('bondData', () => {
   const gdpGrowthData = ref<Record<string, DataPoint[]> | null>(null);
   const policyRatesData = ref<Record<string, DataPoint[]> | null>(null);
   const exchangeRatesData = ref<Record<string, DataPoint[]> | null>(null);
+  
+  const deficitData = ref<Record<string, DataPoint[]> | null>(null);
+  const consumerConfData = ref<Record<string, DataPoint[]> | null>(null);
+  const retailSalesData = ref<Record<string, DataPoint[]> | null>(null);
+  const savingRateData = ref<Record<string, DataPoint[]> | null>(null);
   
   const isLoading = ref<boolean>(false);
   const error = ref<string | null>(null);
@@ -70,6 +83,10 @@ export const useBondDataStore = defineStore('bondData', () => {
           gdpGrowthData.value = parsed.gdpGrowth || null;
           policyRatesData.value = parsed.policyRates || null;
           exchangeRatesData.value = parsed.exchangeRates || null;
+          deficitData.value = parsed.deficit || null;
+          consumerConfData.value = parsed.consumerConf || null;
+          retailSalesData.value = parsed.retailSales || null;
+          savingRateData.value = parsed.savingRate || null;
           lastUpdated.value = parsed.timestamp;
           return true;
         }
@@ -96,6 +113,10 @@ export const useBondDataStore = defineStore('bondData', () => {
         gdpGrowth: gdpGrowthData.value,
         policyRates: policyRatesData.value,
         exchangeRates: exchangeRatesData.value,
+        deficit: deficitData.value,
+        consumerConf: consumerConfData.value,
+        retailSales: retailSalesData.value,
+        savingRate: savingRateData.value,
         timestamp: Date.now()
       };
       sessionStorage.setItem(CACHE_KEY, JSON.stringify(cacheData));
@@ -128,7 +149,11 @@ export const useBondDataStore = defineStore('bondData', () => {
         unemployment,
         gdpGrowth,
         policyRates,
-        exchangeRates
+        exchangeRates,
+        deficit,
+        consumerConf,
+        retailSales,
+        savingRate
       ] = await Promise.all([
         fetchEuroAreaYields('all'),
         fetchEuroAreaYields('aaa'),
@@ -141,7 +166,11 @@ export const useBondDataStore = defineStore('bondData', () => {
         fetchUnemployment(),
         fetchGdpGrowth(),
         fetchPolicyRates(),
-        fetchExchangeRates()
+        fetchExchangeRates(),
+        fetchDeficit(),
+        fetchConsumerConfidence(),
+        fetchRetailSales(),
+        fetchSavingRate()
       ]);
 
       euroAreaAll.value = allYields;
@@ -156,6 +185,10 @@ export const useBondDataStore = defineStore('bondData', () => {
       gdpGrowthData.value = gdpGrowth;
       policyRatesData.value = policyRates;
       exchangeRatesData.value = exchangeRates;
+      deficitData.value = deficit;
+      consumerConfData.value = consumerConf;
+      retailSalesData.value = retailSales;
+      savingRateData.value = savingRate;
       lastUpdated.value = Date.now();
 
       saveCache();
@@ -181,6 +214,10 @@ export const useBondDataStore = defineStore('bondData', () => {
     gdpGrowthData,
     policyRatesData,
     exchangeRatesData,
+    deficitData,
+    consumerConfData,
+    retailSalesData,
+    savingRateData,
     isLoading,
     error,
     lastUpdated,

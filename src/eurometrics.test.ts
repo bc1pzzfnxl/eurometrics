@@ -62,6 +62,16 @@ describe('EuroMetrics Store & Selection Sanitization Tests', () => {
     filtersStore.activeTab = 'monetary';
     await nextTick();
     expect(filtersStore.rateCategory).toBe('policy_rate');
+
+    // Switch to Stability
+    filtersStore.activeTab = 'stability';
+    await nextTick();
+    expect(filtersStore.rateCategory).toBe('deficit');
+
+    // Switch to Activity
+    filtersStore.activeTab = 'activity';
+    await nextTick();
+    expect(filtersStore.rateCategory).toBe('retail_sales');
   });
 
   it('should sanitize selectedCountries during category transitions', async () => {
@@ -147,6 +157,42 @@ describe('EuroMetrics Live API Fetching & Mapping Tests', () => {
     expect(exchange['CHF']).toBeDefined();
     expect(exchange['JPY']).toBeDefined();
     expect(exchange['USD'][0].value).toBeTypeOf('number');
+  }, 10000);
+
+  it('should successfully parse and cache Government Deficit from Eurostat JSON-stat', async () => {
+    const deficit = await ecbApi.fetchDeficit();
+    expect(deficit).toBeDefined();
+    expect(Object.keys(deficit).length).toBeGreaterThan(0);
+    expect(deficit['DE']).toBeDefined();
+    expect(deficit['EA']).toBeDefined();
+    expect(deficit['DE'][0].value).toBeTypeOf('number');
+  }, 10000);
+
+  it('should successfully parse and cache Consumer Confidence from Eurostat JSON-stat', async () => {
+    const confidence = await ecbApi.fetchConsumerConfidence();
+    expect(confidence).toBeDefined();
+    expect(Object.keys(confidence).length).toBeGreaterThan(0);
+    expect(confidence['DE']).toBeDefined();
+    expect(confidence['EA']).toBeDefined();
+    expect(confidence['DE'][0].value).toBeTypeOf('number');
+  }, 10000);
+
+  it('should successfully parse and cache Retail Sales from Eurostat JSON-stat', async () => {
+    const retail = await ecbApi.fetchRetailSales();
+    expect(retail).toBeDefined();
+    expect(Object.keys(retail).length).toBeGreaterThan(0);
+    expect(retail['DE']).toBeDefined();
+    expect(retail['EA']).toBeDefined();
+    expect(retail['DE'][0].value).toBeTypeOf('number');
+  }, 10000);
+
+  it('should successfully parse and cache Household Saving Rates from Eurostat JSON-stat', async () => {
+    const saving = await ecbApi.fetchSavingRate();
+    expect(saving).toBeDefined();
+    expect(Object.keys(saving).length).toBeGreaterThan(0);
+    expect(saving['DE']).toBeDefined();
+    expect(saving['EA']).toBeDefined();
+    expect(saving['DE'][0].value).toBeTypeOf('number');
   }, 10000);
 });
 

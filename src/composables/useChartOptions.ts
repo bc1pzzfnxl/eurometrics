@@ -56,8 +56,10 @@ export function useChartOptions(activeSeries: Ref<BondSeries[]>, isDark: Ref<boo
     };
 
     // Determine unit formatting based on active category
-    const isPercentage = filtersStore.rateCategory !== 'exchange_rate';
-    const unitSuffix = isPercentage ? '%' : '';
+    const isPercentage = !['exchange_rate', 'consumer_conf'].includes(filtersStore.rateCategory);
+    const unitSuffix = filtersStore.rateCategory === 'consumer_conf' 
+      ? ' pts' 
+      : (isPercentage ? '%' : '');
 
     // Format series for ECharts
     const chartSeries = activeSeries.value.map((s: BondSeries) => {
@@ -65,7 +67,11 @@ export function useChartOptions(activeSeries: Ref<BondSeries[]>, isDark: Ref<boo
       s.points.forEach((p: DataPoint) => dataMap.set(p.date, p.value));
 
       let lastVal: number | null = null;
-      const isStepCategory = ['policy_rate', 'mortgage', 'corporate', 'deposit', 'inflation', 'unemployment', 'gdp', 'debt_gdp'].includes(filtersStore.rateCategory);
+      const isStepCategory = [
+        'policy_rate', 'mortgage', 'corporate', 'deposit', 
+        'inflation', 'unemployment', 'gdp', 'debt_gdp',
+        'deficit', 'consumer_conf', 'retail_sales', 'saving_rate'
+      ].includes(filtersStore.rateCategory);
 
       // Map values matching the global timeline to align all lines properly
       // Forward-fill (carry forward last known observation) for step categories so tooltip works on all intermediate dates

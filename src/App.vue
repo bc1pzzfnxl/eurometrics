@@ -508,7 +508,7 @@ const marqueeItems = computed(() => {
         </div>
         
         <!-- Navigation Tabs -->
-        <nav class="flex items-center gap-1 border border-border p-0.5 bg-surface/50 font-mono text-[10px] md:text-xs">
+        <nav class="flex flex-wrap items-center gap-1 border border-border p-0.5 bg-surface/50 font-mono text-[10px] md:text-xs">
           <button 
             @click="filtersStore.activeTab = 'rates'"
             class="px-2 md:px-3 py-1 cursor-pointer select-none transition-colors border-0"
@@ -529,6 +529,20 @@ const marqueeItems = computed(() => {
             :class="[filtersStore.activeTab === 'monetary' ? 'bg-foreground text-background font-bold' : 'text-text-muted hover:text-text-primary hover:bg-surface']"
           >
             MONETARY & FOREX
+          </button>
+          <button 
+            @click="filtersStore.activeTab = 'stability'"
+            class="px-2 md:px-3 py-1 cursor-pointer select-none transition-colors border-0"
+            :class="[filtersStore.activeTab === 'stability' ? 'bg-foreground text-background font-bold' : 'text-text-muted hover:text-text-primary hover:bg-surface']"
+          >
+            FINANCIAL STABILITY
+          </button>
+          <button 
+            @click="filtersStore.activeTab = 'activity'"
+            class="px-2 md:px-3 py-1 cursor-pointer select-none transition-colors border-0"
+            :class="[filtersStore.activeTab === 'activity' ? 'bg-foreground text-background font-bold' : 'text-text-muted hover:text-text-primary hover:bg-surface']"
+          >
+            ACTIVITY & CONSUMPTION
           </button>
         </nav>
 
@@ -590,7 +604,7 @@ const marqueeItems = computed(() => {
               <span>MACROECONOMICS</span>
             </div>
             <p class="text-sm md:text-base text-text-muted">
-              General government debt-to-GDP is fetched from the ECB's <strong>Government Finance Statistics (GFS)</strong> (quarterly basis, Maastricht criteria limit is <strong>60%</strong>). HICP YoY Inflation is from the ECB's <strong>Harmonised Index of Consumer Prices (ICP)</strong>. GDP growth rate (YoY % change) and monthly Unemployment rate (%) are sourced from <strong>Eurostat</strong> datasets.
+              HICP YoY Inflation is sourced from the ECB's <strong>Harmonised Index of Consumer Prices (ICP)</strong>. GDP growth rate (YoY % change) and monthly Unemployment rate (%) are sourced from <strong>Eurostat</strong> datasets, reflecting standard macroeconomic indicators.
             </p>
           </div>
 
@@ -602,6 +616,28 @@ const marqueeItems = computed(() => {
             </div>
             <p class="text-sm md:text-base text-text-muted">
               The ECB's key interest policy rate corridor is sourced daily from the ECB's <strong>Financial Market Statistics (FM)</strong>, representing the marginal lending, main refinancing, and deposit facility rates. EUR monthly exchange rates are sourced from the ECB's <strong>Foreign Exchange Rates (EXR)</strong> database.
+            </p>
+          </div>
+
+          <!-- Card 6 -->
+          <div class="flex flex-col md:flex-row items-start gap-4 md:gap-6 p-5 border border-border bg-surface/50">
+            <div class="flex items-center gap-2 text-text-primary font-bold shrink-0 bg-surface px-3 py-1.5 border border-border text-xs md:text-sm">
+              <span>ⓘ</span>
+              <span>FINANCIAL STABILITY</span>
+            </div>
+            <p class="text-sm md:text-base text-text-muted">
+              General government deficit/surplus (% of GDP) is sourced quarterly from Eurostat's <strong>General Government Accounts</strong> (Maastricht Treaty deficit limit is <strong>3%</strong>). Government debt-to-GDP is sourced from the ECB's <strong>Government Finance Statistics (GFS)</strong> (Maastricht criteria limit is <strong>60%</strong>).
+            </p>
+          </div>
+
+          <!-- Card 7 -->
+          <div class="flex flex-col md:flex-row items-start gap-4 md:gap-6 p-5 border border-border bg-surface/50">
+            <div class="flex items-center gap-2 text-text-primary font-bold shrink-0 bg-surface px-3 py-1.5 border border-border text-xs md:text-sm">
+              <span>ⓘ</span>
+              <span>ACTIVITY & CONSUMPTION</span>
+            </div>
+            <p class="text-sm md:text-base text-text-muted">
+              Retail Sales YoY Growth is sourced monthly from Eurostat's <strong>Short-term Business Statistics (STS)</strong>. Consumer Confidence balances are sourced monthly from Eurostat's <strong>Business and Consumer Surveys</strong>. Household Saving Rate is sourced quarterly from Eurostat's <strong>Quarterly Sector Accounts</strong>.
             </p>
           </div>
         </div>

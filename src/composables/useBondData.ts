@@ -73,6 +73,14 @@ export function useBondData() {
         sourceData = dataStore.policyRatesData;
       } else if (filtersStore.rateCategory === 'exchange_rate') {
         sourceData = dataStore.exchangeRatesData;
+      } else if (filtersStore.rateCategory === 'deficit') {
+        sourceData = dataStore.deficitData;
+      } else if (filtersStore.rateCategory === 'consumer_conf') {
+        sourceData = dataStore.consumerConfData;
+      } else if (filtersStore.rateCategory === 'retail_sales') {
+        sourceData = dataStore.retailSalesData;
+      } else if (filtersStore.rateCategory === 'saving_rate') {
+        sourceData = dataStore.savingRateData;
       }
 
       if (!sourceData) return [];
