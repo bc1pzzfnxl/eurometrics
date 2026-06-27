@@ -149,7 +149,7 @@ const isSelected = (code: string) => {
       <PopoverContent class="w-[320px] p-0 border-border bg-background rounded-none" align="start">
         <Command class="font-mono text-xs">
           <CommandInput :placeholder="filtersStore.rateCategory === 'policy_rate' ? 'Search rates...' : filtersStore.rateCategory === 'exchange_rate' ? 'Search currencies...' : 'Search countries...'" class="font-mono text-xs" />
-          <CommandList class="max-h-[300px] overflow-y-auto">
+          <CommandList class="max-h-[500px] overflow-y-auto">
             <CommandEmpty class="p-2 font-mono text-xs text-text-muted">No countries found.</CommandEmpty>
             <CommandGroup>
               <CommandItem
