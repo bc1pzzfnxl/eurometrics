@@ -6,6 +6,7 @@ import { useFiltersStore } from './stores/filtersStore';
 import ControlBar from './components/ControlBar.vue';
 import BondChart from './components/BondChart.vue';
 import ThemeToggle from './components/ThemeToggle.vue';
+import QuickCompare from './components/QuickCompare.vue';
 
 const dataStore = useBondDataStore();
 const filtersStore = useFiltersStore();
@@ -27,7 +28,7 @@ const handlePopState = () => {
 };
 
 const handleKeyDown = (e: KeyboardEvent) => {
-  if (currentPath.value !== '/app' && e.key === 'Enter') {
+  if (currentPath.value !== '/app' && currentPath.value !== '/compare' && e.key === 'Enter') {
     navigateTo('/app');
   }
 };
@@ -209,7 +210,7 @@ const destroyGlobe = () => {
 
 // Lifecycle
 watch(currentPath, async (newPath) => {
-  if (newPath !== '/app') {
+  if (newPath !== '/app' && newPath !== '/compare') {
     await nextTick();
     initGlobe();
   } else {
@@ -221,7 +222,7 @@ onMounted(() => {
   // Always load API data in the background to prime the cache and populate the marquee
   dataStore.fetchAllData();
 
-  if (currentPath.value !== '/app') {
+  if (currentPath.value !== '/app' && currentPath.value !== '/compare') {
     nextTick(() => {
       initGlobe();
     });
@@ -302,7 +303,7 @@ const marqueeItems = computed(() => {
 
 <template>
   <!-- Screen A: Landing Page -->
-  <div v-if="currentPath !== '/app'" class="relative bg-white text-[#003399] min-h-[100dvh] w-full flex flex-col justify-between overflow-hidden select-none font-sans">
+  <div v-if="currentPath !== '/app' && currentPath !== '/compare'" class="relative bg-white text-[#003399] min-h-[100dvh] w-full flex flex-col justify-between overflow-hidden select-none font-sans">
     <!-- Dynamic SVG Yield Curve Background -->
     <div class="absolute inset-0 w-full h-full pointer-events-none z-0 opacity-30 select-none">
       <svg class="w-full h-full" viewBox="0 0 1440 600" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
@@ -446,6 +447,12 @@ const marqueeItems = computed(() => {
           >
             EXPLORE LIVE DATA <span class="inline-block transition-transform group-hover:translate-x-1">→</span>
           </button>
+          <button
+            @click="navigateTo('/compare')"
+            class="group px-8 py-3 bg-transparent text-[#003399] font-mono text-xs tracking-widest uppercase font-bold border border-[#003399]/30 hover:border-[#003399]/60 hover:bg-[#003399]/5 active:scale-98 transition-all cursor-pointer shadow-none rounded-none w-full sm:w-auto"
+          >
+            QUICK COMPARE <span class="inline-block transition-transform group-hover:translate-x-1">→</span>
+          </button>
           <span class="font-mono text-[10px] text-[#003399]/40 uppercase tracking-widest self-center md:self-start pl-1">
             Free · No signup · Updated daily
           </span>
@@ -491,7 +498,10 @@ const marqueeItems = computed(() => {
     </footer>
   </div>
 
-  <!-- Screen B: Main Dashboard App -->
+  <!-- Screen B: Quick Compare -->
+  <QuickCompare v-else-if="currentPath === '/compare'" :navigateTo="navigateTo" />
+
+  <!-- Screen C: Main Dashboard App -->
   <div v-else class="relative bg-background text-foreground min-h-screen">
     <!-- Screen 1: Sticky Main Dashboard (Header + Controls + Chart) -->
     <div
