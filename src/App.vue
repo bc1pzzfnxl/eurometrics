@@ -511,7 +511,11 @@ const marqueeItems = computed(() => {
       <!-- Header -->
       <header class="flex flex-col sm:flex-row items-center justify-between p-4 sm:p-3 border-b border-border select-none bg-background gap-3">
         <div class="flex flex-col min-[400px]:flex-row min-[400px]:items-baseline gap-1 min-[400px]:gap-3 self-start sm:self-auto">
-          <h1 class="font-sans font-semibold tracking-wider text-sm uppercase">
+          <h1 
+            @click="navigateTo('/')"
+            class="font-sans font-semibold tracking-wider text-sm uppercase cursor-pointer hover:opacity-75 transition-opacity"
+            title="Return to landing page"
+          >
             EuroMetrics
           </h1>
           <span 
