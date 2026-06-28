@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, computed } from 'vue';
 import { useBondDataStore } from '../stores/bondDataStore';
+import { useFiltersStore } from '../stores/filtersStore';
 import { useBondData } from '../composables/useBondData';
 import { useChartOptions } from '../composables/useChartOptions';
 
@@ -26,6 +27,7 @@ use([
 ]);
 
 const dataStore = useBondDataStore();
+const filtersStore = useFiltersStore();
 const { activeSeries } = useBondData();
 
 // Reactive check for theme classes using MutationObserver
@@ -53,6 +55,34 @@ onUnmounted(() => {
 
 // Build reactive ECharts options
 const chartOptions = useChartOptions(activeSeries, isDark);
+
+// Reference to vue-echarts component to trigger export
+const chartRef = ref<any>(null);
+
+const exportChart = () => {
+  if (!chartRef.value) return;
+  // Get direct ECharts instance (proxied or via .chart)
+  const chartInstance = chartRef.value.chart || chartRef.value;
+  if (!chartInstance || typeof chartInstance.getDataURL !== 'function') {
+    console.error('ECharts instance or getDataURL method not found');
+    return;
+  }
+
+  try {
+    const dataUrl = chartInstance.getDataURL({
+      type: 'png',
+      pixelRatio: 3, // Premium ultra-high-res 3x scale for crisp presentations
+      backgroundColor: isDark.value ? '#0A0A0A' : '#F5F5F5',
+    });
+
+    const link = document.createElement('a');
+    link.download = `eurometrics_${filtersStore.activeTab}_${filtersStore.rateCategory}_${Date.now()}.png`;
+    link.href = dataUrl;
+    link.click();
+  } catch (error) {
+    console.error('Failed to export chart:', error);
+  }
+};
 
 // States check
 const hasData = computed(() => {
@@ -103,10 +133,20 @@ const retryFetch = () => {
     <!-- Active Chart display -->
     <div 
       v-else 
-      class="w-full flex-grow pt-4 px-4 pb-8 flex flex-col justify-center items-center min-h-0"
+      class="w-full flex-grow pt-4 px-4 pb-8 flex flex-col justify-center items-center min-h-0 relative"
       id="chart-container"
     >
+      <!-- Export button -->
+      <button 
+        @click="exportChart"
+        class="absolute top-2 right-4 border border-border bg-surface/80 hover:bg-surface px-2.5 py-1 font-mono text-[9px] tracking-wider font-bold transition-all duration-200 cursor-pointer select-none z-10 hover:text-text-primary text-text-muted rounded-none"
+        title="Export current chart as PNG image"
+      >
+        EXPORT PNG ↓
+      </button>
+
       <v-chart 
+        ref="chartRef"
         class="w-full h-full flex-grow min-h-0" 
         :option="chartOptions" 
         autoresize 
