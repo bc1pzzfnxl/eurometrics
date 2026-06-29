@@ -1,0 +1,255 @@
+<script setup lang="ts">
+import { ref, watch, nextTick } from 'vue';
+import { useFiltersStore } from '../stores/filtersStore';
+import { useBondDataStore } from '../stores/bondDataStore';
+
+const props = defineProps<{
+  currentPath: string;
+}>();
+
+const filtersStore = useFiltersStore();
+const dataStore = useBondDataStore();
+
+const isOpen = ref(false);
+const messages = ref<{ id: number; role: 'user' | 'assistant'; content: string }[]>([]);
+const input = ref('');
+const isStreaming = ref(false);
+const messagesEndRef = ref<HTMLDivElement | null>(null);
+
+const scrollToBottom = () => {
+  nextTick(() => {
+    if (messagesEndRef.value) {
+      messagesEndRef.value.scrollIntoView({ behavior: 'smooth' });
+    }
+  });
+};
+
+watch(isOpen, (newVal) => {
+  if (newVal) {
+    scrollToBottom();
+  }
+});
+
+const sendMessage = async () => {
+  if (!input.value.trim() || isStreaming.value) return;
+
+  const userMsg = input.value;
+  messages.value.push({ id: Date.now(), role: 'user', content: userMsg });
+  input.value = '';
+  isStreaming.value = true;
+  scrollToBottom();
+
+  // Construct chart & dashboard data context to feed the AI model
+  const dataContext: Record<string, any> = {
+    activeTab: filtersStore.activeTab,
+    selectedCountries: filtersStore.selectedCountries,
+  };
+
+  // Attach relevant data arrays depending on the active view
+  if (dataStore.countriesData) {
+    dataContext.featuredYields = {
+      DE: dataStore.countriesData['DE']?.at(-1)?.value,
+      FR: dataStore.countriesData['FR']?.at(-1)?.value,
+      IT: dataStore.countriesData['IT']?.at(-1)?.value,
+      ES: dataStore.countriesData['ES']?.at(-1)?.value,
+    };
+  }
+  if (dataStore.policyRatesData) {
+    dataContext.ecbPolicyRates = {
+      DFR: dataStore.policyRatesData['DFR']?.at(-1)?.value,
+      MRR: dataStore.policyRatesData['MRR_FR']?.at(-1)?.value,
+    };
+  }
+
+  try {
+    const response = await fetch('/agents/ChatAgent/session', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        message: userMsg,
+        options: { dataContext }
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error('AI Agent connection failed');
+    }
+
+    const reader = response.body?.getReader();
+    const decoder = new TextDecoder();
+    let assistantMsg = '';
+    const assistantId = Date.now() + 1;
+    
+    messages.value.push({ id: assistantId, role: 'assistant', content: '' });
+
+    if (reader) {
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        const chunk = decoder.decode(value, { stream: true });
+        
+        // Vercel AI SDK text stream outputs chunks prepended with codes (e.g. 0:"text"). 
+        // We clean up these stream format wrappers to show raw clean text.
+        const cleanedChunk = chunk
+          .split('\n')
+          .filter(line => line.startsWith('0:'))
+          .map(line => JSON.parse(line.substring(2)))
+          .join('');
+
+        if (cleanedChunk) {
+          assistantMsg += cleanedChunk;
+          const idx = messages.value.findIndex(m => m.id === assistantId);
+          if (idx !== -1) {
+            messages.value[idx].content = assistantMsg;
+            scrollToBottom();
+          }
+        }
+      }
+    }
+  } catch (error) {
+    console.error('Error talking to AI agent:', error);
+    messages.value.push({
+      id: Date.now() + 2,
+      role: 'assistant',
+      content: 'Sorry, I encountered an issue connecting to the macroeconomic intelligence server. Please try again.'
+    });
+    scrollToBottom();
+  } finally {
+    isStreaming.value = false;
+  }
+};
+</script>
+
+<template>
+  <div class="fixed bottom-6 right-6 z-50 font-mono">
+    <!-- Toggle Button -->
+    <button 
+      @click="isOpen = !isOpen"
+      class="flex items-center gap-2 px-4 py-2.5 shadow-lg select-none cursor-pointer border transition-all duration-200 active:scale-95"
+      :class="[
+        currentPath !== '/app' && currentPath !== '/compare'
+          ? 'bg-[#003399] border-[#003399] text-white hover:bg-[#002280]'
+          : 'bg-foreground border-border text-background hover:opacity-90'
+      ]"
+    >
+      <span class="text-sm">{{ isOpen ? '✕' : '💬' }}</span>
+      <span class="text-[10px] font-bold tracking-wider uppercase">{{ isOpen ? 'CLOSE' : 'ASK AI ANALYST' }}</span>
+    </button>
+
+    <!-- Chat Overlay Window -->
+    <div 
+      v-if="isOpen"
+      class="absolute bottom-14 right-0 w-[320px] sm:w-[380px] h-[480px] flex flex-col shadow-2xl transition-all duration-300 border"
+      :class="[
+        currentPath !== '/app' && currentPath !== '/compare'
+          ? 'bg-white border-[#003399]/20 text-[#003399]'
+          : 'bg-background border-border text-foreground'
+      ]"
+    >
+      <!-- Chat Header -->
+      <div 
+        class="p-3 border-b flex items-center justify-between"
+        :class="[
+          currentPath !== '/app' && currentPath !== '/compare'
+            ? 'bg-[#003399] border-[#003399]/10 text-white'
+            : 'bg-surface border-border text-foreground font-bold'
+        ]"
+      >
+        <span class="text-[10px] font-bold tracking-widest uppercase">EUROMETRICS AI ANALYST</span>
+        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+      </div>
+
+      <!-- Messages Window -->
+      <div class="flex-grow p-4 overflow-y-auto flex flex-col gap-3">
+        <!-- Welcome Message -->
+        <div 
+          class="p-3 border text-xs leading-relaxed"
+          :class="[
+            currentPath !== '/app' && currentPath !== '/compare'
+              ? 'bg-[#003399]/4 border-[#003399]/15'
+              : 'bg-surface/50 border-border'
+          ]"
+        >
+          <p class="font-bold uppercase text-[9px] mb-1 opacity-70">SYSTEM</p>
+          <p>
+            Welcome to EuroMetrics AI. I am directly connected to the ECB and Eurostat data pipelines. Ask me questions about:
+          </p>
+          <ul class="list-disc pl-4 mt-1.5 space-y-1">
+            <li>What these macro/yield indicators mean.</li>
+            <li>Relevance of Maastricht interest rate criteria.</li>
+            <li>Reasons behind inflation spikes or yield spreads.</li>
+          </ul>
+        </div>
+
+        <!-- Chat Stream -->
+        <div 
+          v-for="msg in messages" 
+          :key="msg.id"
+          class="p-3 border max-w-[85%] flex flex-col gap-1 text-xs leading-relaxed"
+          :class="[
+            msg.role === 'user'
+              ? (currentPath !== '/app' && currentPath !== '/compare'
+                  ? 'bg-[#003399]/2 border-[#003399]/20 self-end'
+                  : 'bg-surface border-border self-end')
+              : (currentPath !== '/app' && currentPath !== '/compare'
+                  ? 'bg-white border-[#003399]/10 self-start'
+                  : 'bg-surface/40 border-border self-start')
+          ]"
+        >
+          <span class="text-[9px] font-bold uppercase tracking-wider opacity-60">
+            {{ msg.role === 'user' ? 'USER' : 'ANALYST' }}
+          </span>
+          <p class="whitespace-pre-wrap">{{ msg.content }}</p>
+        </div>
+
+        <!-- Streaming Indicator -->
+        <div 
+          v-if="isStreaming && !messages.at(-1)?.content"
+          class="p-3 bg-surface/30 border border-border text-xs text-text-muted self-start max-w-[85%] animate-pulse"
+        >
+          Analyzing metrics...
+        </div>
+
+        <div ref="messagesEndRef"></div>
+      </div>
+
+      <!-- Chat Input Form -->
+      <form 
+        @submit.prevent="sendMessage"
+        class="p-2 border-t flex gap-2"
+        :class="[
+          currentPath !== '/app' && currentPath !== '/compare'
+            ? 'border-[#003399]/10 bg-white'
+            : 'border-border bg-surface'
+        ]"
+      >
+        <input 
+          v-model="input"
+          placeholder="Ask a macro question..."
+          class="flex-grow px-3 py-2 text-xs border bg-transparent focus:outline-none"
+          :class="[
+            currentPath !== '/app' && currentPath !== '/compare'
+              ? 'border-[#003399]/20 text-[#003399] focus:border-[#003399]'
+              : 'border-border text-foreground focus:border-text-primary'
+          ]"
+          :disabled="isStreaming"
+        />
+        <button 
+          type="submit"
+          class="px-4 py-2 text-[10px] font-bold tracking-widest uppercase cursor-pointer border transition-all"
+          :class="[
+            currentPath !== '/app' && currentPath !== '/compare'
+              ? 'bg-[#003399] border-[#003399] text-white hover:bg-[#002280]'
+              : 'bg-foreground border-border text-background hover:opacity-90'
+          ]"
+          :disabled="isStreaming"
+        >
+          SEND
+        </button>
+      </form>
+    </div>
+  </div>
+</template>

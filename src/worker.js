@@ -1,6 +1,15 @@
+import { routeAgentRequest } from "agents";
+export { ChatAgent } from "./agent.js";
+
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
+
+    // 0. Route Agents SDK requests
+    if (url.pathname.startsWith('/agents/')) {
+      const response = routeAgentRequest(request, env);
+      if (response) return response;
+    }
 
     // 1. Handle CORS Preflight (OPTIONS)
     if (request.method === 'OPTIONS') {

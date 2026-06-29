@@ -8,6 +8,7 @@ import ThemeToggle from './components/ThemeToggle.vue';
 const ControlBar = defineAsyncComponent(() => import('./components/ControlBar.vue'));
 const BondChart = defineAsyncComponent(() => import('./components/BondChart.vue'));
 const QuickCompare = defineAsyncComponent(() => import('./components/QuickCompare.vue'));
+const AiChatDock = defineAsyncComponent(() => import('./components/AiChatDock.vue'));
 
 const dataStore = useBondDataStore();
 const filtersStore = useFiltersStore();
@@ -748,4 +749,5 @@ const marqueeItems = computed(() => {
       </div>
     </div>
   </div>
+  <AiChatDock :currentPath="currentPath" />
 </template>
