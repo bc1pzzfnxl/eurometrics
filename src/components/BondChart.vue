@@ -56,40 +56,22 @@ onUnmounted(() => {
 // Build reactive ECharts options
 const chartOptions = useChartOptions(activeSeries, isDark);
 
-// Reference to vue-echarts component to trigger export
 const chartRef = ref<any>(null);
-const isExporting = ref(false);
 
 const exportChart = () => {
-  if (!chartRef.value || isExporting.value) return;
-  
-  isExporting.value = true;
+  const chartInstance = chartRef.value?.chart || chartRef.value;
+  if (!chartInstance || typeof chartInstance.getDataURL !== 'function') return;
 
-  // Defer canvas drawing slightly to let Vue render the loading button state first
-  setTimeout(() => {
-    try {
-      const chartInstance = chartRef.value.chart || chartRef.value;
-      if (!chartInstance || typeof chartInstance.getDataURL !== 'function') {
-        console.error('ECharts instance or getDataURL method not found');
-        return;
-      }
+  const dataUrl = chartInstance.getDataURL({
+    type: 'png',
+    pixelRatio: 3,
+    backgroundColor: isDark.value ? '#0A0A0A' : '#F5F5F5',
+  });
 
-      const dataUrl = chartInstance.getDataURL({
-        type: 'png',
-        pixelRatio: 3, // Premium ultra-high-res 3x scale for crisp presentations
-        backgroundColor: isDark.value ? '#0A0A0A' : '#F5F5F5',
-      });
-
-      const link = document.createElement('a');
-      link.download = `eurometrics_${filtersStore.activeTab}_${filtersStore.rateCategory}_${Date.now()}.png`;
-      link.href = dataUrl;
-      link.click();
-    } catch (error) {
-      console.error('Failed to export chart:', error);
-    } finally {
-      isExporting.value = false;
-    }
-  }, 60);
+  const link = document.createElement('a');
+  link.download = `eurometrics_${filtersStore.activeTab}_${filtersStore.rateCategory}_${Date.now()}.png`;
+  link.href = dataUrl;
+  link.click();
 };
 
 // States check
@@ -147,13 +129,10 @@ const retryFetch = () => {
       <!-- Export button -->
       <button 
         @click="exportChart"
-        :disabled="isExporting"
         class="absolute top-2 right-4 border border-border bg-surface/80 hover:bg-surface px-2.5 py-1 font-mono text-[9px] tracking-wider font-bold transition-all duration-200 cursor-pointer select-none z-10 hover:text-text-primary text-text-muted rounded-none"
-        :class="[isExporting ? 'opacity-60 cursor-wait' : '']"
         title="Export current chart as PNG image"
       >
-        <span v-if="isExporting" class="animate-pulse">EXPORTING...</span>
-        <span v-else>EXPORT PNG ↓</span>
+        <span>EXPORT PNG ↓</span>
       </button>
 
       <v-chart 

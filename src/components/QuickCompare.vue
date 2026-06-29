@@ -11,10 +11,7 @@ const props = defineProps<{
 const dataStore = useBondDataStore();
 const selectedCountry = ref('FR');
 
-const getLatest = (points: DataPoint[] | undefined): number | null => {
-  if (!points || points.length === 0) return null;
-  return points[points.length - 1].value;
-};
+const getLatest = (pts?: DataPoint[]) => pts?.at(-1)?.value ?? null;
 
 const countryName = computed(() => {
   return COUNTRIES.find(c => c.code === selectedCountry.value)?.name ?? selectedCountry.value;
@@ -59,30 +56,16 @@ const categories = computed(() => {
   ];
 });
 
-const fmt = (val: number | null, decimals: number): string => {
-  if (val === null) return '—';
-  return val.toFixed(decimals);
-};
+const fmt = (val: number | null, dec: number) => val === null ? '—' : val.toFixed(dec);
 
-const delta = (a: number | null, b: number | null, decimals: number): string => {
-  if (a === null || b === null) return '—';
-  const diff = a - b;
-  const sign = diff > 0 ? '+' : '';
-  return `${sign}${diff.toFixed(decimals)}`;
-};
+const delta = (a: number | null, b: number | null, dec: number) => a === null || b === null ? '—' : `${a - b > 0 ? '+' : ''}${(a - b).toFixed(dec)}`;
 
-// ponytail: heat-map row tint based on delta magnitude and economic context (higherIsBetter)
-const rowStyle = (countryVal: number | null, eaVal: number | null, higherIsBetter: boolean): Record<string, string> => {
-  if (countryVal === null || eaVal === null) return {};
-  const diff = countryVal - eaVal;
+const rowStyle = (cVal: number | null, eaVal: number | null, hib: boolean) => {
+  if (cVal === null || eaVal === null) return {};
+  const diff = cVal - eaVal;
   if (Math.abs(diff) < 0.005) return {};
-
-  const intensity = Math.min(Math.abs(diff) / 4, 1) * 0.14;
-  const isGood = higherIsBetter ? diff > 0 : diff < 0;
-
-  // Muted green (#346538) for positive impact, muted red (#9F2F2D) for negative impact
-  const color = isGood ? `rgba(52, 101, 56, ${intensity})` : `rgba(159, 47, 45, ${intensity})`;
-  return { backgroundColor: color };
+  const isGood = hib ? diff > 0 : diff < 0;
+  return { backgroundColor: `rgba(${isGood ? '52, 101, 56' : '159, 47, 45'}, ${Math.min(Math.abs(diff) / 4, 1) * 0.14})` };
 };
 </script>
 
