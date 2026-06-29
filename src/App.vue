@@ -1,12 +1,13 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref, computed, watch, nextTick } from 'vue';
+import { onMounted, onUnmounted, ref, computed, watch, nextTick, defineAsyncComponent } from 'vue';
 import createGlobe from 'cobe';
 import { useBondDataStore } from './stores/bondDataStore';
 import { useFiltersStore } from './stores/filtersStore';
-import ControlBar from './components/ControlBar.vue';
-import BondChart from './components/BondChart.vue';
 import ThemeToggle from './components/ThemeToggle.vue';
-import QuickCompare from './components/QuickCompare.vue';
+
+const ControlBar = defineAsyncComponent(() => import('./components/ControlBar.vue'));
+const BondChart = defineAsyncComponent(() => import('./components/BondChart.vue'));
+const QuickCompare = defineAsyncComponent(() => import('./components/QuickCompare.vue'));
 
 const dataStore = useBondDataStore();
 const filtersStore = useFiltersStore();
@@ -18,13 +19,16 @@ const windowHeight = ref(0);
 const navigateTo = (path: string) => {
   window.history.pushState({}, '', path);
   currentPath.value = path;
-  if (path === '/app') {
+  if (path === '/app' || path === '/compare') {
     dataStore.fetchAllData();
   }
 };
 
 const handlePopState = () => {
   currentPath.value = window.location.pathname;
+  if (currentPath.value === '/app' || currentPath.value === '/compare') {
+    dataStore.fetchAllData();
+  }
 };
 
 const handleKeyDown = (e: KeyboardEvent) => {
@@ -142,6 +146,7 @@ const featuredBonds = computed(() => {
 });
 
 let animationFrameId: number | null = null;
+let renderTimer: any = null;
 
 // Globe instantiation
 const initGlobe = () => {
@@ -152,6 +157,10 @@ const initGlobe = () => {
   if (animationFrameId) {
     cancelAnimationFrame(animationFrameId);
     animationFrameId = null;
+  }
+  if (renderTimer) {
+    clearTimeout(renderTimer);
+    renderTimer = null;
   }
   
   if (!globeCanvas.value) return;
@@ -181,9 +190,7 @@ const initGlobe = () => {
       })
   });
 
-  // Keep a static requestAnimationFrame loop running.
-  // This resolves the bug in Cobe's compiled ESM build where texture image onload updates
-  // are not painted to the canvas unless a re-render is triggered on a frame cycle.
+  // Keep a static requestAnimationFrame loop running for a limited time to ensure loading paints, then stop.
   const animate = () => {
     if (globe) {
       globe.update({
@@ -195,6 +202,13 @@ const initGlobe = () => {
   };
 
   animate();
+
+  renderTimer = setTimeout(() => {
+    if (animationFrameId) {
+      cancelAnimationFrame(animationFrameId);
+      animationFrameId = null;
+    }
+  }, 2000);
 };
 
 const destroyGlobe = () => {
@@ -205,6 +219,10 @@ const destroyGlobe = () => {
   if (animationFrameId) {
     cancelAnimationFrame(animationFrameId);
     animationFrameId = null;
+  }
+  if (renderTimer) {
+    clearTimeout(renderTimer);
+    renderTimer = null;
   }
 };
 
@@ -239,12 +257,14 @@ watch(currentPath, async (newPath) => {
 
 onMounted(() => {
   updateMetadata(currentPath.value);
-  dataStore.fetchAllData();
 
   if (currentPath.value !== '/app' && currentPath.value !== '/compare') {
+    dataStore.fetchLandingData();
     nextTick(() => {
       initGlobe();
     });
+  } else {
+    dataStore.fetchAllData();
   }
 
   window.addEventListener('popstate', handlePopState);
@@ -254,6 +274,7 @@ onMounted(() => {
   windowHeight.value = window.innerHeight;
   scrollY.value = window.scrollY;
 });
+
 
 onUnmounted(() => {
   window.removeEventListener('popstate', handlePopState);

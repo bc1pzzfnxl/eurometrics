@@ -38,6 +38,7 @@ interface CacheData {
   retailSales: Record<string, DataPoint[]> | null;
   savingRate: Record<string, DataPoint[]> | null;
   timestamp: number;
+  isFullDataLoaded: boolean;
 }
 
 export const useBondDataStore = defineStore('bondData', () => {
@@ -62,15 +63,19 @@ export const useBondDataStore = defineStore('bondData', () => {
   const isLoading = ref<boolean>(false);
   const error = ref<string | null>(null);
   const lastUpdated = ref<number | null>(null);
+  const isFullDataLoaded = ref<boolean>(false);
 
   // Load from sessionStorage cache on init
-  const loadCache = (): boolean => {
+  const loadCache = (requireFull = false): boolean => {
     try {
       const cached = sessionStorage.getItem(CACHE_KEY);
       if (cached) {
         const parsed = JSON.parse(cached) as CacheData;
         const now = Date.now();
         if (now - parsed.timestamp < CACHE_DURATION_MS) {
+          if (requireFull && !parsed.isFullDataLoaded) {
+            return false;
+          }
           euroAreaAll.value = parsed.euroAreaAll;
           euroAreaAaa.value = parsed.euroAreaAaa;
           countriesData.value = parsed.countries;
@@ -88,6 +93,7 @@ export const useBondDataStore = defineStore('bondData', () => {
           retailSalesData.value = parsed.retailSales || null;
           savingRateData.value = parsed.savingRate || null;
           lastUpdated.value = parsed.timestamp;
+          isFullDataLoaded.value = !!parsed.isFullDataLoaded;
           return true;
         }
       }
@@ -117,7 +123,8 @@ export const useBondDataStore = defineStore('bondData', () => {
         consumerConf: consumerConfData.value,
         retailSales: retailSalesData.value,
         savingRate: savingRateData.value,
-        timestamp: Date.now()
+        timestamp: Date.now(),
+        isFullDataLoaded: isFullDataLoaded.value
       };
       sessionStorage.setItem(CACHE_KEY, JSON.stringify(cacheData));
     } catch (e) {
@@ -125,9 +132,9 @@ export const useBondDataStore = defineStore('bondData', () => {
     }
   };
 
-  const fetchAllData = async (forceRefresh = false) => {
-    if (!forceRefresh && loadCache()) {
-      console.log('Loaded bond and bank/GDP data from client cache.');
+  const fetchLandingData = async (forceRefresh = false) => {
+    if (!forceRefresh && loadCache(false)) {
+      console.log('Loaded landing data from client cache.');
       return;
     }
 
@@ -135,7 +142,48 @@ export const useBondDataStore = defineStore('bondData', () => {
     error.value = null;
 
     try {
-      // Run the calls in parallel to speed up page load
+      console.log('Fetching landing page bond & inflation data...');
+      const [
+        allYields, 
+        countryYields, 
+        inflation,
+        policyRates,
+        exchangeRates,
+      ] = await Promise.all([
+        fetchEuroAreaYields('all'),
+        fetchCountryYields(),
+        fetchHicpInflation(),
+        fetchPolicyRates(),
+        fetchExchangeRates(),
+      ]);
+
+      euroAreaAll.value = allYields;
+      countriesData.value = countryYields;
+      inflationData.value = inflation;
+      policyRatesData.value = policyRates;
+      exchangeRatesData.value = exchangeRates;
+      lastUpdated.value = Date.now();
+
+      saveCache();
+      console.log('Successfully fetched and cached landing data.');
+    } catch (e: any) {
+      console.error('Error fetching landing data:', e);
+      error.value = 'Unable to load data. Please retry.';
+    } finally {
+      isLoading.value = false;
+    }
+  };
+
+  const fetchAllData = async (forceRefresh = false) => {
+    if (!forceRefresh && loadCache(true)) {
+      console.log('Loaded all bond and bank/GDP data from client cache.');
+      return;
+    }
+
+    isLoading.value = true;
+    error.value = null;
+
+    try {
       console.log('Fetching all bond, bank interest, and GDP debt data from ECB/Eurostat...');
       const [
         allYields, 
@@ -190,6 +238,7 @@ export const useBondDataStore = defineStore('bondData', () => {
       retailSalesData.value = retailSales;
       savingRateData.value = savingRate;
       lastUpdated.value = Date.now();
+      isFullDataLoaded.value = true;
 
       saveCache();
       console.log('Successfully fetched and cached bond, bank, and GDP data.');
@@ -221,6 +270,8 @@ export const useBondDataStore = defineStore('bondData', () => {
     isLoading,
     error,
     lastUpdated,
+    isFullDataLoaded,
+    fetchLandingData,
     fetchAllData,
   };
 });
