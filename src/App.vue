@@ -208,8 +208,27 @@ const destroyGlobe = () => {
   }
 };
 
-// Lifecycle
+const updateMetadata = (path: string) => {
+  let title = 'EuroMetrics - Eurozone Macro & Interest Rate Dashboard';
+  let desc = 'Interactive, real-time dashboard tracking Eurozone macroeconomic indicators, retail interest rates, and sovereign bond yields directly from official sources like ECB and Eurostat.';
+
+  if (path === '/app') {
+    title = 'EuroMetrics Dashboard - Real-time Eurozone Macro Indicators';
+    desc = 'Explore interactive charts, sovereign bond yields, bank mortgage rates, inflation rates, and more macroeconomic indicators for all Eurozone countries.';
+  } else if (path === '/compare') {
+    title = 'Quick Compare - Compare Eurozone Macroeconomic Indicators';
+    desc = 'Quickly compare retail interest rates, inflation, GDP growth, and debt-to-GDP indicators of individual Eurozone countries against the Eurozone average.';
+  }
+
+  document.title = title;
+  const descEl = document.querySelector('meta[name="description"]');
+  if (descEl) {
+    descEl.setAttribute('content', desc);
+  }
+};
+
 watch(currentPath, async (newPath) => {
+  updateMetadata(newPath);
   if (newPath !== '/app' && newPath !== '/compare') {
     await nextTick();
     initGlobe();
@@ -219,7 +238,7 @@ watch(currentPath, async (newPath) => {
 });
 
 onMounted(() => {
-  // Always load API data in the background to prime the cache and populate the marquee
+  updateMetadata(currentPath.value);
   dataStore.fetchAllData();
 
   if (currentPath.value !== '/app' && currentPath.value !== '/compare') {
