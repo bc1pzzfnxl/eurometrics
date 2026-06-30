@@ -753,6 +753,21 @@ const marqueeItems = computed(() => {
               </ul>
             </div>
           </div>
+
+          <!-- Card 8: Theme 6 -->
+          <div class="flex flex-col md:flex-row items-start gap-4 md:gap-6 p-5 border border-border bg-surface/50">
+            <div class="flex items-center gap-2 text-text-primary font-bold shrink-0 bg-surface px-3 py-1.5 border border-border text-[10px] md:text-xs tracking-wider">
+              <span>06</span>
+              <span>GDP SECTORS</span>
+            </div>
+            <div class="text-sm md:text-base text-text-muted flex flex-col gap-3 w-full">
+              <p>Breaks down the structure of national economies by industrial and service activity branches (NACE Rev. 2 classification):</p>
+              <ul class="list-disc pl-5 space-y-2 text-xs md:text-sm">
+                <li><strong>Sectoral Gross Value Added (GVA)</strong>: Shows the total economic value produced by 10 main sectors (Agriculture, Industry & Energy, Construction, Trade & Food, IT & Telecom, Finance, Real Estate, Professional & Support, Public Admin & Health, and Recreation & Other Services).</li>
+                <li><strong>Interactive Year Share</strong>: The circular chart shows the percentage share of each sector for a selected year, demonstrating the degree of tertiarisation or industrialisation of a country.</li>
+              </ul>
+            </div>
+          </div>
         </div>
 
         <!-- Source / Updates Footer -->
