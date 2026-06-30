@@ -25,6 +25,10 @@ export default defineConfig({
         target: 'https://data-api.ecb.europa.eu',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/_api-ecb/, '/service')
+      },
+      '/api': {
+        target: 'http://localhost:8787',
+        changeOrigin: true
       }
     }
   },
@@ -34,6 +38,10 @@ export default defineConfig({
         target: 'https://data-api.ecb.europa.eu',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/_api-ecb/, '/service')
+      },
+      '/api': {
+        target: 'http://localhost:8787',
+        changeOrigin: true
       }
     }
   }
