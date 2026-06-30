@@ -4,6 +4,80 @@ import type { BondSeries, DataPoint } from '../types/bond';
 import { COUNTRIES } from '../constants/countries';
 import { useFiltersStore } from '../stores/filtersStore';
 
+interface MacroEvent {
+  date: string;
+  endDate?: string;
+  name: string;
+}
+
+const findClosestDate = (targetDate: string, dates: string[]): string | undefined => {
+  if (dates.length === 0) return undefined;
+  if (targetDate.length === 7) {
+    const match = dates.find(d => d.startsWith(targetDate));
+    if (match) return match;
+  }
+  if (dates.includes(targetDate)) return targetDate;
+  const targetTime = new Date(targetDate).getTime();
+  let closest = dates[0];
+  let minDiff = Math.abs(new Date(closest).getTime() - targetTime);
+  for (let i = 1; i < dates.length; i++) {
+    const diff = Math.abs(new Date(dates[i]).getTime() - targetTime);
+    if (diff < minDiff) {
+      minDiff = diff;
+      closest = dates[i];
+    }
+  }
+  return closest;
+};
+
+const getCategoryEvents = (category: string): MacroEvent[] => {
+  switch (category) {
+    case 'sovereign':
+      return [
+        { date: '2008-09-15', name: 'Lehman' },
+        { date: '2010-05-02', endDate: '2012-07-26', name: 'Debt Crisis' },
+        { date: '2012-07-26', name: 'Whatever It Takes' },
+        { date: '2015-03-09', name: 'QE Launch' },
+        { date: '2020-03-18', name: 'PEPP Launch' }
+      ];
+    case 'policy_rate':
+      return [
+        { date: '2008-09-15', name: 'Lehman' },
+        { date: '2014-06-11', name: 'Negative DFR' },
+        { date: '2020-03-18', name: 'PEPP Launch' },
+        { date: '2022-07-21', name: 'First Hike' }
+      ];
+    case 'inflation':
+      return [
+        { date: '2008-09-15', name: 'Lehman' },
+        { date: '2020-03-01', endDate: '2021-06-01', name: 'Pandemic' },
+        { date: '2022-02-24', name: 'Ukraine War' }
+      ];
+    case 'unemployment':
+    case 'gdp':
+      return [
+        { date: '2008-09-15', endDate: '2009-06-30', name: 'Great Recession' },
+        { date: '2020-03-01', endDate: '2020-09-30', name: 'Lockdowns' },
+        { date: '2022-02-24', name: 'Ukraine War' }
+      ];
+    case 'debt_gdp':
+    case 'deficit':
+      return [
+        { date: '2008-09-15', endDate: '2010-12-31', name: 'GFC Response' },
+        { date: '2020-03-01', endDate: '2021-12-31', name: 'COVID Response' }
+      ];
+    case 'consumer_conf':
+    case 'retail_sales':
+    case 'saving_rate':
+      return [
+        { date: '2020-03-01', endDate: '2020-06-30', name: 'Lockdowns' },
+        { date: '2022-09-01', name: 'Energy Crisis Peak' }
+      ];
+    default:
+      return [];
+  }
+};
+
 export function useChartOptions(activeSeries: Ref<BondSeries[]>, isDark: Ref<boolean>) {
   const filtersStore = useFiltersStore();
 
@@ -61,8 +135,68 @@ export function useChartOptions(activeSeries: Ref<BondSeries[]>, isDark: Ref<boo
       ? ' pts' 
       : (isPercentage ? '%' : '');
 
+    // Calculate annotations (markLine and markArea) based on active category
+    const categoryEvents = getCategoryEvents(filtersStore.rateCategory);
+    const markLineData: any[] = [];
+    const markAreaData: any[] = [];
+
+    categoryEvents.forEach(evt => {
+      const startCl = findClosestDate(evt.date, sortedDates);
+      if (!startCl) return;
+
+      if (evt.endDate) {
+        const endCl = findClosestDate(evt.endDate, sortedDates);
+        if (endCl) {
+          markAreaData.push([
+            { xAxis: startCl, name: evt.name },
+            { xAxis: endCl }
+          ]);
+        }
+      } else {
+        markLineData.push({
+          xAxis: startCl,
+          name: evt.name,
+          label: {
+            formatter: evt.name
+          }
+        });
+      }
+    });
+
+    const markLine = markLineData.length > 0 ? {
+      symbol: ['none', 'none'],
+      lineStyle: {
+        color: dark ? 'rgba(245, 245, 245, 0.3)' : 'rgba(0, 51, 153, 0.35)',
+        type: 'dashed',
+        width: 1
+      },
+      label: {
+        show: true,
+        position: 'end',
+        color: dark ? 'rgba(245, 245, 245, 0.6)' : 'rgba(0, 51, 153, 0.65)',
+        fontFamily: 'JetBrains Mono, monospace',
+        fontSize: 8,
+        distance: 2
+      },
+      data: markLineData
+    } : undefined;
+
+    const markArea = markAreaData.length > 0 ? {
+      itemStyle: {
+        color: dark ? 'rgba(245, 245, 245, 0.03)' : 'rgba(0, 51, 153, 0.04)'
+      },
+      label: {
+        show: true,
+        position: 'top',
+        color: dark ? 'rgba(245, 245, 245, 0.4)' : 'rgba(0, 51, 153, 0.45)',
+        fontFamily: 'JetBrains Mono, monospace',
+        fontSize: 8
+      },
+      data: markAreaData
+    } : undefined;
+
     // Format series for ECharts
-    const chartSeries = activeSeries.value.map((s: BondSeries) => {
+    const chartSeries = activeSeries.value.map((s: BondSeries, idx: number) => {
       const dataMap = new Map<string, number>();
       s.points.forEach((p: DataPoint) => dataMap.set(p.date, p.value));
 
@@ -107,6 +241,8 @@ export function useChartOptions(activeSeries: Ref<BondSeries[]>, isDark: Ref<boo
           color,
         },
         connectNulls: true, // Handle missing country dates gracefully
+        markLine: idx === 0 ? markLine : undefined,
+        markArea: idx === 0 ? markArea : undefined,
       };
     });
 
