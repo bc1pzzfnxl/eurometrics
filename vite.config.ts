@@ -27,5 +27,14 @@ export default defineConfig({
         rewrite: (path) => path.replace(/^\/_api-ecb/, '/service')
       }
     }
+  },
+  preview: {
+    proxy: {
+      '/_api-ecb': {
+        target: 'https://data-api.ecb.europa.eu',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/_api-ecb/, '/service')
+      }
+    }
   }
 })

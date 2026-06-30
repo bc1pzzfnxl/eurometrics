@@ -132,6 +132,15 @@ export const useBondDataStore = defineStore('bondData', () => {
     }
   };
 
+  const safeFetch = async <T>(fn: () => Promise<T>, label: string): Promise<T | null> => {
+    try {
+      return await fn();
+    } catch (err) {
+      console.warn(`Non-blocking fetch failure for ${label}:`, err);
+      return null;
+    }
+  };
+
   const fetchLandingData = async (forceRefresh = false) => {
     if (!forceRefresh && loadCache(false)) {
       console.log('Loaded landing data from client cache.');
@@ -150,12 +159,16 @@ export const useBondDataStore = defineStore('bondData', () => {
         policyRates,
         exchangeRates,
       ] = await Promise.all([
-        fetchEuroAreaYields('all'),
-        fetchCountryYields(),
-        fetchHicpInflation(),
-        fetchPolicyRates(),
-        fetchExchangeRates(),
+        safeFetch(() => fetchEuroAreaYields('all'), 'allYields'),
+        safeFetch(() => fetchCountryYields(), 'countryYields'),
+        safeFetch(() => fetchHicpInflation(), 'inflation'),
+        safeFetch(() => fetchPolicyRates(), 'policyRates'),
+        safeFetch(() => fetchExchangeRates(), 'exchangeRates'),
       ]);
+
+      if (!allYields && !countryYields) {
+        throw new Error('Core yield datasets failed to load.');
+      }
 
       euroAreaAll.value = allYields;
       countriesData.value = countryYields;
@@ -168,7 +181,7 @@ export const useBondDataStore = defineStore('bondData', () => {
       console.log('Successfully fetched and cached landing data.');
     } catch (e: any) {
       console.error('Error fetching landing data:', e);
-      error.value = 'Unable to load data. Please retry.';
+      error.value = 'Unable to load core market data. Please retry.';
     } finally {
       isLoading.value = false;
     }
@@ -203,23 +216,27 @@ export const useBondDataStore = defineStore('bondData', () => {
         retailSales,
         savingRate
       ] = await Promise.all([
-        fetchEuroAreaYields('all'),
-        fetchEuroAreaYields('aaa'),
-        fetchCountryYields(),
-        fetchBankRates('mortgage'),
-        fetchBankRates('corporate'),
-        fetchBankRates('deposit'),
-        fetchDebtToGdp(),
-        fetchHicpInflation(),
-        fetchUnemployment(),
-        fetchGdpGrowth(),
-        fetchPolicyRates(),
-        fetchExchangeRates(),
-        fetchDeficit(),
-        fetchConsumerConfidence(),
-        fetchRetailSales(),
-        fetchSavingRate()
+        safeFetch(() => fetchEuroAreaYields('all'), 'allYields'),
+        safeFetch(() => fetchEuroAreaYields('aaa'), 'aaaYields'),
+        safeFetch(() => fetchCountryYields(), 'countryYields'),
+        safeFetch(() => fetchBankRates('mortgage'), 'mortgages'),
+        safeFetch(() => fetchBankRates('corporate'), 'corporates'),
+        safeFetch(() => fetchBankRates('deposit'), 'deposits'),
+        safeFetch(() => fetchDebtToGdp(), 'debtGdp'),
+        safeFetch(() => fetchHicpInflation(), 'inflation'),
+        safeFetch(() => fetchUnemployment(), 'unemployment'),
+        safeFetch(() => fetchGdpGrowth(), 'gdpGrowth'),
+        safeFetch(() => fetchPolicyRates(), 'policyRates'),
+        safeFetch(() => fetchExchangeRates(), 'exchangeRates'),
+        safeFetch(() => fetchDeficit(), 'deficit'),
+        safeFetch(() => fetchConsumerConfidence(), 'consumerConf'),
+        safeFetch(() => fetchRetailSales(), 'retailSales'),
+        safeFetch(() => fetchSavingRate(), 'savingRate')
       ]);
+
+      if (!allYields && !countryYields) {
+        throw new Error('Core yield datasets failed to load.');
+      }
 
       euroAreaAll.value = allYields;
       euroAreaAaa.value = aaaYields;
@@ -244,7 +261,7 @@ export const useBondDataStore = defineStore('bondData', () => {
       console.log('Successfully fetched and cached bond, bank, and GDP data.');
     } catch (e: any) {
       console.error('Error fetching bond data:', e);
-      error.value = 'Unable to load data. Please retry.';
+      error.value = 'Unable to load core market data. Please retry.';
     } finally {
       isLoading.value = false;
     }

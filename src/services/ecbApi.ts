@@ -134,7 +134,7 @@ function parseEcbYieldCurve(response: EcbSdmxResponse): Record<string, DataPoint
 
   const seriesList = response.structure.dimensions.series;
   const dtIndex = seriesList.findIndex(d => d.id === 'DATA_TYPE_FM');
-  const timeValues = response.structure.dimensions.observation.find(d => d.id === 'TIME_PERIOD')?.values || [];
+  const timeValues = response.structure.dimensions.observation?.find(d => d.id === 'TIME_PERIOD')?.values || [];
 
   if (dtIndex === -1 || timeValues.length === 0) {
     return parsedData;
@@ -186,7 +186,7 @@ function parseEcbCountryYields(response: EcbSdmxResponse): Record<string, DataPo
 
   const seriesList = response.structure.dimensions.series;
   const refAreaIndex = seriesList.findIndex(d => d.id === 'REF_AREA');
-  const timeValues = response.structure.dimensions.observation.find(d => d.id === 'TIME_PERIOD')?.values || [];
+  const timeValues = response.structure.dimensions.observation?.find(d => d.id === 'TIME_PERIOD')?.values || [];
 
   if (refAreaIndex === -1 || timeValues.length === 0) {
     return parsedData;
@@ -451,7 +451,7 @@ function parseEcbPolicyRates(response: EcbSdmxResponse): Record<string, DataPoin
 
   const seriesList = response.structure.dimensions.series;
   const rateIdx = seriesList.findIndex(d => d.id === 'PROVIDER_FM_ID');
-  const timeValues = response.structure.dimensions.observation.find(d => d.id === 'TIME_PERIOD')?.values || [];
+  const timeValues = response.structure.dimensions.observation?.find(d => d.id === 'TIME_PERIOD')?.values || [];
 
   if (rateIdx === -1 || timeValues.length === 0) {
     return parsedData;
@@ -514,7 +514,7 @@ function parseEcbExchangeRates(response: EcbSdmxResponse): Record<string, DataPo
 
   const seriesList = response.structure.dimensions.series;
   const currencyIdx = seriesList.findIndex(d => d.id === 'CURRENCY');
-  const timeValues = response.structure.dimensions.observation.find(d => d.id === 'TIME_PERIOD')?.values || [];
+  const timeValues = response.structure.dimensions.observation?.find(d => d.id === 'TIME_PERIOD')?.values || [];
 
   if (currencyIdx === -1 || timeValues.length === 0) {
     return parsedData;
