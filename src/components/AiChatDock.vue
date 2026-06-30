@@ -160,10 +160,10 @@ const sendMessage = async () => {
       <span class="text-[10px] font-bold tracking-wider uppercase">{{ isOpen ? 'CLOSE' : 'ASK AI ANALYST' }}</span>
     </button>
 
-    <!-- Chat Overlay Window (Increased dimensions to 360px/420px width and 520px height) -->
+    <!-- Chat Overlay Window (Increased dimensions and high contrast theme) -->
     <div 
       v-if="isOpen"
-      class="absolute bottom-14 right-0 w-[360px] sm:w-[420px] h-[520px] flex flex-col shadow-2xl transition-all duration-300 border bg-background border-[#003399]/20 dark:border-[#003399]/40 text-foreground"
+      class="absolute bottom-14 right-0 w-[360px] sm:w-[420px] h-[520px] flex flex-col shadow-2xl transition-all duration-300 border bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-100"
     >
       <!-- Chat Header (Solid Brand Blue) -->
       <div class="bg-[#003399] text-white p-3.5 border-b border-[#003399]/10 flex items-center justify-between font-bold">
@@ -173,9 +173,9 @@ const sendMessage = async () => {
 
       <!-- Messages Window -->
       <div class="flex-grow p-4 overflow-y-auto flex flex-col gap-3">
-        <!-- Welcome Message (Branded Blue Accents) -->
-        <div class="p-3 border text-xs leading-relaxed bg-[#003399]/5 border-[#003399]/15 text-[#003399] dark:text-blue-200 dark:bg-[#003399]/10">
-          <p class="font-bold uppercase text-[9px] mb-1 opacity-70">SYSTEM</p>
+        <!-- Welcome Message (Clean High-Contrast Gray Card) -->
+        <div class="p-3 border text-xs leading-relaxed bg-slate-50 dark:bg-slate-800/40 border-slate-200/60 dark:border-slate-700/60 text-slate-700 dark:text-slate-300">
+          <p class="font-bold uppercase text-[9px] mb-1 opacity-70 text-[#003399] dark:text-blue-400">SYSTEM</p>
           <p>
             Welcome to EuroMetrics AI. I am directly connected to the ECB and Eurostat data pipelines. Ask me questions about:
           </p>
@@ -193,11 +193,14 @@ const sendMessage = async () => {
           class="p-3 border max-w-[85%] flex flex-col gap-1 text-xs leading-relaxed"
           :class="[
             msg.role === 'user'
-              ? 'bg-[#003399]/10 border-[#003399]/30 text-[#003399] dark:text-blue-300 dark:bg-[#003399]/20 self-end'
-              : 'bg-surface/50 border-border self-start text-foreground'
+              ? 'bg-[#003399] border-[#003399] text-white self-end'
+              : 'bg-slate-50 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-100 self-start'
           ]"
         >
-          <span class="text-[9px] font-bold uppercase tracking-wider opacity-60">
+          <span 
+            class="text-[9px] font-bold uppercase tracking-wider"
+            :class="msg.role === 'user' ? 'text-blue-200' : 'text-[#003399] dark:text-blue-400'"
+          >
             {{ msg.role === 'user' ? 'USER' : 'ANALYST' }}
           </span>
           <p class="whitespace-pre-wrap">{{ msg.content }}</p>
@@ -206,7 +209,7 @@ const sendMessage = async () => {
         <!-- Streaming Indicator -->
         <div 
           v-if="isStreaming && !messages.at(-1)?.content"
-          class="p-3 bg-surface/30 border border-border text-xs text-text-muted self-start max-w-[85%] animate-pulse"
+          class="p-3 bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 text-xs text-slate-500 dark:text-slate-400 self-start max-w-[85%] animate-pulse"
         >
           Analyzing metrics...
         </div>
@@ -217,12 +220,12 @@ const sendMessage = async () => {
       <!-- Chat Input Form -->
       <form 
         @submit.prevent="sendMessage"
-        class="p-2 border-t flex gap-2 border-border bg-surface"
+        class="p-2 border-t flex gap-2 border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900"
       >
         <input 
           v-model="input"
           placeholder="Ask a macro question..."
-          class="flex-grow px-3 py-2 text-xs border bg-transparent text-foreground border-border focus:outline-none focus:border-[#003399] focus:ring-1 focus:ring-[#003399]"
+          class="flex-grow px-3 py-2 text-xs border bg-transparent text-slate-800 dark:text-slate-100 border-slate-200 dark:border-slate-700 focus:outline-none focus:border-[#003399] focus:ring-1 focus:ring-[#003399]"
           :disabled="isStreaming"
         />
         <button 
