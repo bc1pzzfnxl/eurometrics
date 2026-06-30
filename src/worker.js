@@ -26,7 +26,8 @@ Instructions:
 - Explain what the active metrics represent.
 - Provide analytical, math-grounded answers.
 - MUST be extremely concise: answer in maximum 2 sentences (or 60 words).
-- DO NOT use markdown formatting. Output plain text ONLY (no asterisks, headers, lists, or markdown bold/italics).`;
+- DO NOT use markdown formatting. Output plain text ONLY (no asterisks, headers, lists, or markdown bold/italics).
+- MUST append the exact data source in parentheses at the end of the response (e.g., "(Source: ECB)" or "(Source: Eurostat)").`;
 
         const messages = [
           { role: 'system', content: systemPrompt },
