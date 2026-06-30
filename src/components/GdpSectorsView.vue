@@ -52,6 +52,10 @@ onMounted(() => {
     attributeFilter: ['class'],
   });
   
+  if (!dataStore.gdpSectorsData && !dataStore.isLoading) {
+    dataStore.fetchAllData();
+  }
+  
   // Set initial selected year once data is loaded
   const years = availableYears.value;
   if (years.length > 0) {

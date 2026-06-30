@@ -18,7 +18,7 @@ import {
   fetchGdpSectors
 } from '../services/ecbApi';
 
-const CACHE_KEY = 'eu_bonds_data_cache_v7';
+const CACHE_KEY = 'eu_bonds_data_cache_v8';
 const CACHE_DURATION_MS = 60 * 60 * 1000; // 1 hour cache
 
 interface CacheData {
