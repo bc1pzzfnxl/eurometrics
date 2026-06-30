@@ -14,6 +14,8 @@ import {
   TooltipComponent,
   LegendComponent,
   DataZoomComponent,
+  MarkLineComponent,
+  MarkAreaComponent,
 } from 'echarts/components';
 import VChart from 'vue-echarts';
 
@@ -24,6 +26,8 @@ use([
   TooltipComponent,
   LegendComponent,
   DataZoomComponent,
+  MarkLineComponent,
+  MarkAreaComponent,
 ]);
 
 const dataStore = useBondDataStore();
