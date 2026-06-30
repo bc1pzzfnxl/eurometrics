@@ -62,19 +62,20 @@ const sendMessage = async () => {
   }
 
   try {
-    const response = await fetch('/agents/ChatAgent/session', {
+    const response = await fetch('/api/chat', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
         message: userMsg,
-        options: { dataContext }
+        dataContext,
+        history: messages.value.slice(0, -1)
       })
     });
 
     if (!response.ok) {
-      throw new Error('AI Agent connection failed');
+      throw new Error('AI Server connection failed');
     }
 
     const reader = response.body?.getReader();
@@ -91,20 +92,24 @@ const sendMessage = async () => {
 
         const chunk = decoder.decode(value, { stream: true });
         
-        // Vercel AI SDK text stream outputs chunks prepended with codes (e.g. 0:"text"). 
-        // We clean up these stream format wrappers to show raw clean text.
-        const cleanedChunk = chunk
-          .split('\n')
-          .filter(line => line.startsWith('0:'))
-          .map(line => JSON.parse(line.substring(2)))
-          .join('');
-
-        if (cleanedChunk) {
-          assistantMsg += cleanedChunk;
-          const idx = messages.value.findIndex(m => m.id === assistantId);
-          if (idx !== -1) {
-            messages.value[idx].content = assistantMsg;
-            scrollToBottom();
+        const lines = chunk.split('\n');
+        for (const line of lines) {
+          if (line.startsWith('data: ')) {
+            const dataStr = line.substring(6).trim();
+            if (dataStr === '[DONE]') break;
+            try {
+              const parsed = JSON.parse(dataStr);
+              if (parsed.response) {
+                assistantMsg += parsed.response;
+                const idx = messages.value.findIndex(m => m.id === assistantId);
+                if (idx !== -1) {
+                  messages.value[idx].content = assistantMsg;
+                  scrollToBottom();
+                }
+              }
+            } catch (e) {
+              // Ignore partial lines
+            }
           }
         }
       }

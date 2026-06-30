@@ -7,8 +7,53 @@ export default {
 
     // 0. Route Agents SDK requests
     if (url.pathname.startsWith('/agents/')) {
-      const response = routeAgentRequest(request, env);
+      const response = await routeAgentRequest(request, env);
       if (response) return response;
+    }
+
+    // 0.5. Handle AI Chat API
+    if (url.pathname === '/api/chat' && request.method === 'POST') {
+      try {
+        const { message, dataContext, history = [] } = await request.json();
+        
+        const systemPrompt = `You are EuroMetrics AI, a professional macroeconomic analyst.
+You help users interpret the eurozone economic indicators displayed on screen.
+
+Active Chart Context:
+${JSON.stringify(dataContext || {})}
+
+Instructions:
+- Explain what the active metrics represent (e.g., Maastricht 10Y convergence yields, HICP inflation, corporate loan interest rates).
+- Provide analytical, math-grounded answers. If yields or inflation are unusually high or low (e.g., Greece/Italy spreads vs Germany, or inflation vs the ECB's 2.0% target), highlight why.
+- Keep responses professional, highly concise, and fully objective.
+- Use markdown formatting for readability.`;
+
+        const messages = [
+          { role: 'system', content: systemPrompt },
+          ...history.map((msg) => ({ role: msg.role, content: msg.content })),
+          { role: 'user', content: message }
+        ];
+
+        const aiResponse = await env.AI.run('@cf/meta/llama-3.1-8b-instruct', {
+          messages,
+          stream: true
+        });
+
+        return new Response(aiResponse, {
+          headers: {
+            'Content-Type': 'text/event-stream',
+            'Cache-Control': 'no-cache',
+            'Connection': 'keep-alive',
+            'Access-Control-Allow-Origin': '*'
+          }
+        });
+      } catch (error) {
+        console.error('Error in /api/chat:', error);
+        return new Response(JSON.stringify({ error: error.message }), {
+          status: 500,
+          headers: { 'Content-Type': 'application/json' }
+        });
+      }
     }
 
     // 1. Handle CORS Preflight (OPTIONS)
