@@ -481,11 +481,8 @@ const marqueeItems = computed(() => {
         </p>
         
         <!-- AI Promotion Banner -->
-        <div class="flex items-start gap-3 p-3 border border-[#003399]/20 bg-[#003399]/4 font-mono text-[10px] sm:text-xs text-[#003399] leading-relaxed max-w-md text-left animate-fade-in animation-delay-150">
-          <span class="text-sm shrink-0">🤖</span>
-          <span>
-            <strong>INTELLIGENT AI ANALYST</strong>: Query our real-time AI agent within the dashboard to interpret complex yields, Maastricht Treaty compliance margins, or inflation trends on the fly.
-          </span>
+        <div class="py-2.5 px-3.5 border-l-2 border-[#003399] font-mono text-[10px] sm:text-xs text-[#003399] leading-relaxed max-w-md text-left animate-fade-in animation-delay-150">
+          <strong>INTELLIGENT AI ANALYST</strong> — Query our real-time AI agent within the dashboard to interpret complex yields, Maastricht Treaty compliance margins, or inflation trends on the fly.
         </div>
         
         <!-- CTA -->
