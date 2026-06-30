@@ -46,6 +46,8 @@ const activeDataset = computed(() => {
     return dataStore.policyRatesData;
   } else if (filtersStore.rateCategory === 'exchange_rate') {
     return dataStore.exchangeRatesData;
+  } else if (filtersStore.rateCategory === 'structure') {
+    return dataStore.gdpSectorsData;
   }
   return null;
 });
@@ -73,8 +75,11 @@ const allOptions = computed(() => {
   // Filter the countries list to only include those that actually have data points in the loaded dataset
   const filteredCountries = COUNTRIES.filter(c => {
     if (!dataset) return true; // Fallback if data is not loaded yet
-    const points = dataset[c.code];
-    return points && points.length > 0;
+    const points = dataset[c.code] as any;
+    if (filtersStore.rateCategory === 'structure') {
+      return points && Object.keys(points).length > 0;
+    }
+    return points && Array.isArray(points) && points.length > 0;
   });
 
   if (filtersStore.rateCategory === 'sovereign') {
@@ -86,7 +91,10 @@ const allOptions = computed(() => {
     if (hasEaAaa) list.push({ code: 'EA_AAA', name: 'Euro Area (AAA Only)' });
     return [...list, ...filteredCountries];
   } else {
-    const hasEa = !!(dataset?.['EA'] && dataset['EA'].length > 0);
+    const eaData = dataset?.['EA'] as any;
+    const hasEa = filtersStore.rateCategory === 'structure'
+      ? !!(eaData && Object.keys(eaData).length > 0)
+      : !!(eaData && Array.isArray(eaData) && eaData.length > 0);
     const list = [];
     if (hasEa) list.push({ code: 'EA', name: 'Euro Area (Aggregate)' });
     return [...list, ...filteredCountries];
@@ -94,6 +102,12 @@ const allOptions = computed(() => {
 });
 
 const toggleSelection = (code: string) => {
+  if (filtersStore.rateCategory === 'structure') {
+    filtersStore.selectedCountries = [code];
+    isOpen.value = false; // Close popover immediately on single select
+    return;
+  }
+
   const index = filtersStore.selectedCountries.indexOf(code);
   if (index > -1) {
     // Keep at least one selected

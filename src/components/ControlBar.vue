@@ -60,6 +60,8 @@ const syncValidCountries = () => {
     dataset = dataStore.unemploymentData;
   } else if (category === 'gdp') {
     dataset = dataStore.gdpGrowthData;
+  } else if (category === 'structure') {
+    dataset = dataStore.gdpSectorsData;
   }
 
   if (!dataset) return;
@@ -68,12 +70,17 @@ const syncValidCountries = () => {
     if (code === 'EA') {
       if (category === 'sovereign') {
         return !!(dataStore.euroAreaAll?.['SR_10Y'] && dataStore.euroAreaAll['SR_10Y'].length > 0);
+      } else if (category === 'structure') {
+        return !!(dataset?.['EA'] && Object.keys(dataset['EA']).length > 0);
       } else {
         return !!(dataset?.[code] && dataset[code].length > 0);
       }
     }
     if (code === 'EA_AAA') {
       return category === 'sovereign' && !!(dataStore.euroAreaAaa?.['SR_10Y'] && dataStore.euroAreaAaa['SR_10Y'].length > 0);
+    }
+    if (category === 'structure') {
+      return !!(dataset?.[code] && Object.keys(dataset[code]).length > 0);
     }
     return !!(dataset?.[code] && dataset[code].length > 0);
   });
@@ -84,12 +91,14 @@ const syncValidCountries = () => {
     // Fallback: Select the first country/aggregate that actually has data in the active dataset
     const hasEa = category === 'sovereign'
       ? !!(dataStore.euroAreaAll?.['SR_10Y'] && dataStore.euroAreaAll['SR_10Y'].length > 0)
-      : !!(dataset?.['EA'] && dataset['EA'].length > 0);
+      : (category === 'structure'
+          ? !!(dataset?.['EA'] && Object.keys(dataset['EA']).length > 0)
+          : !!(dataset?.['EA'] && dataset['EA'].length > 0));
       
     if (hasEa) {
       filtersStore.selectedCountries = ['EA'];
     } else {
-      const firstValidCountry = Object.keys(dataset).find(k => dataset?.[k] && dataset[k].length > 0);
+      const firstValidCountry = Object.keys(dataset).find(k => dataset?.[k] && (category === 'structure' ? Object.keys(dataset[k]).length > 0 : dataset[k].length > 0));
       filtersStore.selectedCountries = firstValidCountry ? [firstValidCountry] : ['DE'];
     }
   }
@@ -133,7 +142,7 @@ onMounted(() => {
     >
       <div class="flex flex-col sm:flex-row sm:items-center gap-4">
         <!-- Rate Category Selector -->
-        <div class="flex flex-col gap-1.5 sm:block font-mono text-xs">
+        <div v-if="filtersStore.activeTab !== 'structure'" class="flex flex-col gap-1.5 sm:block font-mono text-xs">
           <label class="sm:hidden text-[10px] text-text-muted font-bold block mb-0.5">CATEGORY</label>
           <Select v-model="filtersStore.rateCategory">
             <SelectTrigger class="w-[220px] border-border font-mono text-xs text-foreground cursor-pointer rounded-none">

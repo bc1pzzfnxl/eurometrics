@@ -633,3 +633,102 @@ export async function fetchSavingRate(): Promise<Record<string, DataPoint[]>> {
     throw error;
   }
 }
+
+/**
+ * Fetches annual GDP value added by 10 NACE sectors from Eurostat nama_10_a10.
+ */
+export async function fetchGdpSectors(): Promise<Record<string, Record<string, DataPoint[]>>> {
+  const eurostatCountries = EUROZONE_COUNTRIES.map(c => c === 'GR' ? 'EL' : c);
+  const queryCountries = [...eurostatCountries, 'EA20', 'EA21', 'EA'];
+  const geoQuery = queryCountries.map(c => `geo=${c}`).join('&');
+  
+  const sectors = ['A', 'B-E', 'F', 'G-I', 'J', 'K', 'L', 'M_N', 'O-Q', 'R-U', 'TOTAL'];
+  const naceQuery = sectors.map(s => `nace_r2=${s}`).join('&');
+
+  const url = `${EUROSTAT_BASE_URL}/nama_10_a10?format=JSON&lang=EN&${geoQuery}&${naceQuery}&unit=CP_MEUR&na_item=B1G`;
+  
+  try {
+    console.log('Fetching GDP NACE sectors from Eurostat nama_10_a10...');
+    const response = await ofetch<any>(url, {
+      retry: 2,
+      retryDelay: 1000,
+    });
+    return parseEcbGdpSectors(response);
+  } catch (error) {
+    console.error('Failed to fetch GDP sectors from Eurostat:', error);
+    throw error;
+  }
+}
+
+function parseEcbGdpSectors(response: any): Record<string, Record<string, DataPoint[]>> {
+  const parsedData: Record<string, Record<string, DataPoint[]>> = {};
+
+  if (!response.value || !response.dimension) return parsedData;
+
+  const naceIdxMap = response.dimension.nace_r2?.category?.index;
+  const geoIdxMap = response.dimension.geo?.category?.index;
+  const timeIdxMap = response.dimension.time?.category?.index;
+
+  if (!naceIdxMap || !geoIdxMap || !timeIdxMap) return parsedData;
+
+  const naceSize = Object.keys(naceIdxMap).length;
+  const geoSize = Object.keys(geoIdxMap).length;
+  const timeSize = Object.keys(timeIdxMap).length;
+
+  const dimIds = response.id || [];
+  const sizes = dimIds.map((id: string) => {
+    if (id === 'nace_r2') return naceSize;
+    if (id === 'geo') return geoSize;
+    if (id === 'time') return timeSize;
+    return 1;
+  });
+
+  const countriesToParse = [...EUROZONE_COUNTRIES, 'EA'];
+
+  for (const targetCode of countriesToParse) {
+    let eurostatCode = targetCode;
+    if (targetCode === 'GR') eurostatCode = 'EL';
+    else if (targetCode === 'EA') {
+      if (geoIdxMap['EA21'] !== undefined) eurostatCode = 'EA21';
+      else if (geoIdxMap['EA20'] !== undefined) eurostatCode = 'EA20';
+      else eurostatCode = 'EA';
+    }
+
+    const geoIdx = geoIdxMap[eurostatCode];
+    if (geoIdx === undefined) continue;
+
+    parsedData[targetCode] = {};
+
+    for (const [naceCode, naceIdx] of Object.entries(naceIdxMap)) {
+      const points: DataPoint[] = [];
+
+      for (const [timeStr, timeIdx] of Object.entries(timeIdxMap)) {
+        const indices = dimIds.map((id: string) => {
+          if (id === 'nace_r2') return naceIdx;
+          if (id === 'geo') return geoIdx;
+          if (id === 'time') return timeIdx;
+          return 0;
+        });
+
+        let flatIdx = 0;
+        let multiplier = 1;
+        for (let i = dimIds.length - 1; i >= 0; i--) {
+          flatIdx += indices[i] * multiplier;
+          multiplier *= sizes[i];
+        }
+
+        const rawVal = response.value[flatIdx.toString()];
+        if (rawVal !== undefined && rawVal !== null) {
+          const standardDateStr = `${timeStr}-01-01`;
+          points.push({ date: standardDateStr, value: typeof rawVal === 'string' ? parseFloat(rawVal) : rawVal });
+        }
+      }
+
+      points.sort((a, b) => a.date.localeCompare(b.date));
+      parsedData[targetCode][naceCode] = points;
+    }
+  }
+
+  return parsedData;
+}
+

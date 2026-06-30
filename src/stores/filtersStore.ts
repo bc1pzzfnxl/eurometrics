@@ -26,6 +26,8 @@ export const useFiltersStore = defineStore('filters', () => {
       rateCategory.value = 'deficit';
     } else if (newTab === 'activity') {
       rateCategory.value = 'retail_sales';
+    } else if (newTab === 'structure') {
+      rateCategory.value = 'structure';
     }
   });
 
@@ -37,6 +39,10 @@ export const useFiltersStore = defineStore('filters', () => {
     } else if (newCategory === 'exchange_rate') {
       const valid = selectedCountries.value.filter(code => ['USD', 'GBP', 'CHF', 'JPY'].includes(code));
       selectedCountries.value = valid.length > 0 ? valid : ['USD'];
+    } else if (newCategory === 'structure') {
+      // Force exactly 1 country for structural pie chart
+      const valid = selectedCountries.value.filter(code => code !== 'EA' && code !== 'EA_AAA' && !['DFR', 'MRR_FR', 'MLFR', 'USD', 'GBP', 'CHF', 'JPY'].includes(code));
+      selectedCountries.value = [valid[0] || 'FR'];
     } else {
       const eurozoneAndAggregates = [
         'AT', 'BE', 'CY', 'DE', 'EE', 'ES', 'FI', 'FR', 'GR', 'HR',

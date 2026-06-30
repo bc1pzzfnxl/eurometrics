@@ -14,7 +14,8 @@ import {
   fetchDeficit,
   fetchConsumerConfidence,
   fetchRetailSales,
-  fetchSavingRate
+  fetchSavingRate,
+  fetchGdpSectors
 } from '../services/ecbApi';
 
 const CACHE_KEY = 'eu_bonds_data_cache_v7';
@@ -37,6 +38,7 @@ interface CacheData {
   consumerConf: Record<string, DataPoint[]> | null;
   retailSales: Record<string, DataPoint[]> | null;
   savingRate: Record<string, DataPoint[]> | null;
+  gdpSectors: Record<string, Record<string, DataPoint[]>> | null;
   timestamp: number;
   isFullDataLoaded: boolean;
 }
@@ -59,6 +61,7 @@ export const useBondDataStore = defineStore('bondData', () => {
   const consumerConfData = ref<Record<string, DataPoint[]> | null>(null);
   const retailSalesData = ref<Record<string, DataPoint[]> | null>(null);
   const savingRateData = ref<Record<string, DataPoint[]> | null>(null);
+  const gdpSectorsData = ref<Record<string, Record<string, DataPoint[]>> | null>(null);
   
   const isLoading = ref<boolean>(false);
   const error = ref<string | null>(null);
@@ -92,6 +95,7 @@ export const useBondDataStore = defineStore('bondData', () => {
           consumerConfData.value = parsed.consumerConf || null;
           retailSalesData.value = parsed.retailSales || null;
           savingRateData.value = parsed.savingRate || null;
+          gdpSectorsData.value = parsed.gdpSectors || null;
           lastUpdated.value = parsed.timestamp;
           isFullDataLoaded.value = !!parsed.isFullDataLoaded;
           return true;
@@ -123,6 +127,7 @@ export const useBondDataStore = defineStore('bondData', () => {
         consumerConf: consumerConfData.value,
         retailSales: retailSalesData.value,
         savingRate: savingRateData.value,
+        gdpSectors: gdpSectorsData.value,
         timestamp: Date.now(),
         isFullDataLoaded: isFullDataLoaded.value
       };
@@ -214,7 +219,8 @@ export const useBondDataStore = defineStore('bondData', () => {
         deficit,
         consumerConf,
         retailSales,
-        savingRate
+        savingRate,
+        gdpSectors
       ] = await Promise.all([
         safeFetch(() => fetchEuroAreaYields('all'), 'allYields'),
         safeFetch(() => fetchEuroAreaYields('aaa'), 'aaaYields'),
@@ -231,7 +237,8 @@ export const useBondDataStore = defineStore('bondData', () => {
         safeFetch(() => fetchDeficit(), 'deficit'),
         safeFetch(() => fetchConsumerConfidence(), 'consumerConf'),
         safeFetch(() => fetchRetailSales(), 'retailSales'),
-        safeFetch(() => fetchSavingRate(), 'savingRate')
+        safeFetch(() => fetchSavingRate(), 'savingRate'),
+        safeFetch(() => fetchGdpSectors(), 'gdpSectors')
       ]);
 
       if (!allYields && !countryYields) {
@@ -254,9 +261,10 @@ export const useBondDataStore = defineStore('bondData', () => {
       consumerConfData.value = consumerConf;
       retailSalesData.value = retailSales;
       savingRateData.value = savingRate;
+      gdpSectorsData.value = gdpSectors;
       lastUpdated.value = Date.now();
       isFullDataLoaded.value = true;
-
+      
       saveCache();
       console.log('Successfully fetched and cached bond, bank, and GDP data.');
     } catch (e: any) {
@@ -284,6 +292,7 @@ export const useBondDataStore = defineStore('bondData', () => {
     consumerConfData,
     retailSalesData,
     savingRateData,
+    gdpSectorsData,
     isLoading,
     error,
     lastUpdated,

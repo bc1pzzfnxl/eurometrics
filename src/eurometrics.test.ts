@@ -138,6 +138,15 @@ describe('EuroMetrics Live API Fetching & Mapping Tests', () => {
     expect(gdp['FR'][0].value).toBeTypeOf('number');
   }, 10000);
 
+  it('should successfully parse and cache GDP sectors from Eurostat JSON-stat', async () => {
+    const sectors = await ecbApi.fetchGdpSectors();
+    expect(sectors).toBeDefined();
+    expect(Object.keys(sectors).length).toBeGreaterThan(0);
+    expect(sectors['FR']).toBeDefined();
+    expect(sectors['FR']['A']).toBeDefined();
+    expect(sectors['FR']['A'][0].value).toBeTypeOf('number');
+  }, 15000);
+
   it('should successfully parse and cache ECB base policy rates corridor from ECB FM', async () => {
     const policy = await ecbApi.fetchPolicyRates();
     expect(policy).toBeDefined();

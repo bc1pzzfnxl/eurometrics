@@ -7,6 +7,7 @@ import ThemeToggle from './components/ThemeToggle.vue';
 
 const ControlBar = defineAsyncComponent(() => import('./components/ControlBar.vue'));
 const BondChart = defineAsyncComponent(() => import('./components/BondChart.vue'));
+const GdpSectorsView = defineAsyncComponent(() => import('./components/GdpSectorsView.vue'));
 const QuickCompare = defineAsyncComponent(() => import('./components/QuickCompare.vue'));
 const AiChatDock = defineAsyncComponent(() => import('./components/AiChatDock.vue'));
 
@@ -611,6 +612,13 @@ const marqueeItems = computed(() => {
           >
             ACTIVITY & CONSUMPTION
           </button>
+          <button 
+            @click="filtersStore.activeTab = 'structure'"
+            class="px-2 md:px-3 py-1 cursor-pointer select-none transition-colors border-0"
+            :class="[filtersStore.activeTab === 'structure' ? 'bg-foreground text-background font-bold' : 'text-text-muted hover:text-text-primary hover:bg-surface']"
+          >
+            GDP SECTORS
+          </button>
         </nav>
 
         <ThemeToggle class="self-end sm:self-auto" />
@@ -621,7 +629,8 @@ const marqueeItems = computed(() => {
 
       <!-- Chart Area -->
       <main class="flex-grow flex flex-col w-full min-h-0 relative">
-        <BondChart />
+        <GdpSectorsView v-if="filtersStore.activeTab === 'structure'" />
+        <BondChart v-else />
         
         <!-- Scroll Indicator -->
         <div 
