@@ -19,10 +19,10 @@ Active Chart Context:
 ${contextString}
 
 Instructions:
-- Explain what the active metrics represent (e.g., Maastricht 10Y convergence yields, HICP inflation, corporate loan interest rates).
-- Provide analytical, math-grounded answers. If yields or inflation are unusually high or low (e.g., Greece/Italy spreads vs Germany, or inflation vs the ECB's 2.0% target), highlight why.
-- Keep responses professional, highly concise, and fully objective.
-- Use markdown formatting for readability.`,
+- Explain what the active metrics represent.
+- Provide analytical, math-grounded answers.
+- MUST be extremely concise: answer in maximum 2 sentences (or 60 words).
+- DO NOT use markdown formatting. Output plain text ONLY (no asterisks, headers, lists, or markdown bold/italics).`,
       messages: await convertToModelMessages(this.messages),
       abortSignal: options?.abortSignal,
       onFinish
