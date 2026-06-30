@@ -11,7 +11,7 @@ export class ChatAgent extends AIChatAgent {
     const contextString = JSON.stringify(clientData);
 
     const result = streamText({
-      model: workersai("@cf/meta/llama-3.1-8b-instruct"),
+      model: workersai("@cf/meta/llama-3.1-8b-instruct-fp8"),
       system: `You are EuroMetrics AI, a professional macroeconomic analyst.
 You help users interpret the eurozone economic indicators displayed on screen.
 
